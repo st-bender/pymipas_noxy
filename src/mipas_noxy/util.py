@@ -26,8 +26,19 @@ import xarray as xr
 def get_nc_filename(l2_path, resolution, species, year, month, ext="nc", version="61"):
     """Infer the full path for the level-2 netcdf files
     """
-    species_subdir = f"V8{resolution}_{species}_{version}"
-    file = f"MIPAS-E_IMK.{year:04d}{month:02d}.V8{resolution}_{species}_{version}.{ext}"
+    species_subdir = "V8{resolution}_{species}_{version}".format(
+        resolution=resolution,
+        species=species,
+        version=version,
+    )
+    file = "MIPAS-E_IMK.{year:04d}{month:02d}.V8{resolution}_{species}_{version}.{ext}".format(
+        year=year,
+        month=month,
+        resolution=resolution,
+        species=species,
+        version=version,
+        ext=ext,
+    )
     full_path = path.join(
         l2_path,
         species_subdir,
