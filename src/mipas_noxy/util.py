@@ -169,6 +169,8 @@ def calculate_NOxy(ds, dim="species", keep_attrs=True):
     dof_vars = ["chi2", "rms"]
     akm_vars = ["akm_diagonal", "vr_akdiag", "vr_col", "vr_row"]
 
+    _dsvars = set(ds.data_vars)
+
     # copy first dataset and update later
     mv8_noxy = ds.isel({dim: 0}).drop(dim).copy()
 
@@ -177,16 +179,16 @@ def calculate_NOxy(ds, dim="species", keep_attrs=True):
 
     # update scaled (weighted) variables with the weighted (scaled) sum
     # usually: weights = number of N (nitrogen) atoms in molecule
-    for _v in scaled_vars:
+    for _v in _dsvars & set(scaled_vars):
         mv8_noxy[_v] = (ds[_v] * ds.weights).sum(dim=dim)
 
     # update "squared" variables with the sqrt(sum of squares)
     # e.g. error variables
-    for _v in squared_vars:
+    for _v in _dsvars & set(squared_vars):
         mv8_noxy[_v] = np.sqrt(((ds[_v] * ds.weights)**2).sum(dim=dim))
 
     # update dof-weighted variables with the dof-weighted average
-    for _v in dof_vars:
+    for _v in _dsvars & set(dof_vars):
         mv8_noxy[_v] = (ds[_v] * ds.dof).sum(dim=dim) / mv8_noxy.dof
 
     #if "retrieval_in_logarithmic_parameter_space" in ds.data_vars:
@@ -202,7 +204,7 @@ def calculate_NOxy(ds, dim="species", keep_attrs=True):
     # update akm-like variables with the target-weighted average
     ak_ww = ds.weights * np.abs(ds.target)
     ak_w = ak_ww / ak_ww.sum(dim=dim)
-    for _v in akm_vars:
+    for _v in _dsvars & set(akm_vars):
         # mv8_noxy[_v + "_log"] = (ds[_v] * ds.weights * ds.target).sum(dim=dim) / mv8_noxy.target
         # mv8_noxy[_v + "_1"] = (ds[_v] * ak_w1).sum(dim=dim)
         mv8_noxy[_v] = (ds[_v] * ak_w).sum(dim=dim)
