@@ -170,22 +170,10 @@ def calculate_NOxy(ds, dim="species", keep_attrs=True):
     for _v in _dsvars & set(dof_vars):
         mv8_noxy[_v] = (ds[_v] * ds.dof).sum(dim=dim) / mv8_noxy.dof
 
-    #if "retrieval_in_logarithmic_parameter_space" in ds.data_vars:
-    #    log_w = xr.where(
-    #        ds.retrieval_in_logarithmic_parameter_space,
-    #        ds.target,
-    #        1.0,
-    #    )
-    #else:
-    #    log_w = ds.target
-    #ak_ww1 = ds.weights * log_w
-    #ak_w1 = ak_ww1 / ak_ww1.sum(dim=dim)
     # update akm-like variables with the target-weighted average
     ak_ww = ds.weights * np.abs(ds.target)
     ak_w = ak_ww / ak_ww.sum(dim=dim)
     for _v in _dsvars & set(akm_vars):
-        # mv8_noxy[_v + "_log"] = (ds[_v] * ds.weights * ds.target).sum(dim=dim) / mv8_noxy.target
-        # mv8_noxy[_v + "_1"] = (ds[_v] * ak_w1).sum(dim=dim)
         mv8_noxy[_v] = (ds[_v] * ak_w).sum(dim=dim)
 
     for _v in mv8_noxy.data_vars:
