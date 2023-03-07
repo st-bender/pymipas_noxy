@@ -107,15 +107,6 @@ def read_mv8_species_v1(config, target, year, month, load_kwargs=None):
     w0 = weights[0]
     info("species: %s, version: %s, weight: %s", s0, v0, w0)
     file0 = get_nc_filename(input_path, _res, s0, year, month, version=v0)
-    #info("%s %s", file0, path.exists(file0))
-    #ds0 = open_mipas_l2(file0, **load_kwargs)
-    #ds0 = ds0.expand_dims(species=[s0])
-    #ds0["weights"] = ("species", [w0])
-    #log_retr = (
-    #    ds0.attrs["retrieval_in_logarithmic_parameter_space"].lower()
-    #    in ["1", "true", "yes"]
-    #)
-    #ds0["retrieval_in_logarithmic_parameter_space"] = ("species", [log_retr])
     ds0 = _read_mipas_species(file0, s0, w0, load_kwargs=load_kwargs)
 
     # iterate over the rest
@@ -123,18 +114,6 @@ def read_mv8_species_v1(config, target, year, month, load_kwargs=None):
     for _s, _v, _w in zip(targets[1:], versions[1:], weights[1:]):
         info("species: %s, version: %s, weight: %s", _s, _v, _w)
         _file = get_nc_filename(input_path, _res, _s, year, month, version=_v)
-        #info("%s %s", _file, path.exists(_file))
-        #_ds0 = open_mipas_l2(_file, **load_kwargs)
-        #_ds = _ds0.interp(altitude=ds0.altitude)
-        ## overwrite `target_noise_error` with the squared interpolation
-        ##_ds["target_noise_error"] = np.sqrt((_ds0.target_noise_error**2).interp(altitude=ds0.altitude))
-        #_ds = _ds.expand_dims(species=[_s])
-        #_ds["weights"] = ("species", [_w])
-        #log_retr = (
-        #    _ds.attrs["retrieval_in_logarithmic_parameter_space"].lower()
-        #    in ["1", "true", "yes"]
-        #)
-        #_ds["retrieval_in_logarithmic_parameter_space"] = ("species", [log_retr])
         _ds = _read_mipas_species(_file, _s, _w, interp_alts=ds0.altitude, load_kwargs=load_kwargs)
         dsl.append(_ds)
     return dsl
