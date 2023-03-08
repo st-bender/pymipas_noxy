@@ -81,7 +81,7 @@ def open_mipas_l2(file, **kwargs):
 
 
 def _read_mipas_species(file, _s, _w, interp_alts=None, load_kwargs=None):
-    info("%s %s", file, path.exists(file))
+    debug("%s %s", file, path.exists(file))
     with open_mipas_l2(file, **load_kwargs) as _ds0:
         if interp_alts is not None:
             _ds = _ds0.interp(altitude=interp_alts)
