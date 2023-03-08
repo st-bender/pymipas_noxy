@@ -1,0 +1,47 @@
+# MIPAS_NOxy configuration file
+
+# version will change when the format changes
+version = 1
+
+# R or H for the two MIPAS periods
+resolution = "R"
+
+[output]
+path = "/oath/to/output/NOY/"
+# single target
+targets = ["NOy"]
+## or multiple targets
+# targets = ["NOx", "NOy"]
+
+[input]
+path = "/path/to/input/L2/"
+
+# inputs per output target
+[input.NOx]
+targets = ["NO", "NO2"]
+versions = ["261", "261"] 
+weights = [1, 1]
+
+[input.NOy]
+targets = ["NO", "NO2", "CLONO2", "N2O5", "HNO3", "HNO4"]
+versions = ["261", "261", "261", "261", "261", "262"] 
+weights = [1, 1, 1, 2, 1, 1]
+
+# (multiple) time ranges passed to `xr.date_range()`
+[[times]]
+start = "20100101"
+end = "20100131"
+# "MS" (month start) frequency, if omitted, the default is "D" for daily frequency
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.date_range.html
+freq = "MS"
+
+[[times]]
+start = "20100101"
+end = "20100228"
+freq = "MS"
+
+## A longer time span in one go, even spanning multiple years
+# [[times]]
+# start = "20100101"
+# end = "20121231"
+# freq = "MS"
