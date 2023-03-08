@@ -17,6 +17,8 @@ but the interface might still be subject to change.
 - `numpy` - required
 - `xarray` - required for reading netCDF files
 - `netCDF4` - required for reading netCDF files
+- `scipy` - required for the interpolation interface
+- `click` - required for the command line interface
 - `tomli` - required to read the configuration files
 - `pytest` - optional, for testing
 
