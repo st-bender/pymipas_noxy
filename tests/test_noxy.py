@@ -76,6 +76,8 @@ def test_noxy():
     np.testing.assert_allclose(noxy.target_noise_error, [[3., 4.582576]])
     np.testing.assert_allclose(noxy.chi2, [1.216666667, 1.216666667])
     np.testing.assert_allclose(noxy.akm_diagonal, [[.1375, 0.25]])
+    assert (noxy.geo_id == GEO_IDS[[0, 2]]).all()
+    assert (noxy.time == TIMES[[0, 2]]).all()
 
 
 def test_fixup_target_name():
