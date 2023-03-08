@@ -5,15 +5,17 @@ import xarray as xr
 
 from mipas_noxy.util import combine_NOxy, calculate_NOxy, fixup_target_name
 
+GEO_IDS = np.array(
+    [b"00001_20000101T000001Z", b"00002_20000101T000101Z", b"00003_20000101T000201Z"]
+)
+TIMES = np.array(
+    ["2000-01-01T00:00:01", "2000-01-01T00:01:01", "2000-01-01T00:02:01"],
+    dtype="M8[ns]",
+)
+
 
 def _prep_dss():
-    coords={
-        "time": np.array([
-            "2000-01-01T00:00:01",
-            "2000-01-01T01:00:01",
-        ], dtype="M8[ns]"),
-        "altitude": [50.],
-    }
+    coords = {"time": TIMES, "altitude": [50.]}
     target_attrs = dict(
         standard_name = "mole_fraction_of_nitrogen_monoxide_in_air",
         units = "1e-6",
@@ -25,12 +27,12 @@ def _prep_dss():
     )
     ds1 = xr.Dataset(
         data_vars={
-            "geo_id": (["time"], [b"00001_20000101T000001Z", b"00002_20000101T010001Z"]),
-            "dof": (["time"], [30, 30]),
-            "chi2": (["time"], [1.1, 1.1]),
-            "target": (["altitude", "time"], [[1., 2.]], target_attrs),
-            "target_noise_error": (["altitude", "time"], [[1., 1.]]),
-            "akm_diagonal": (["altitude", "time"], [[0.1, 0.2]]),
+            "geo_id": (["time"], GEO_IDS),
+            "dof": (["time"], [30, 30, 30]),
+            "chi2": (["time"], [1.1, 1.1, 1.1]),
+            "target": (["altitude", "time"], [[1., 1.5, 2.]], target_attrs),
+            "target_noise_error": (["altitude", "time"], [[1., 1., 1.]]),
+            "akm_diagonal": (["altitude", "time"], [[0.1, 0.15, 0.2]]),
             "weights": ([], 1.0),
         },
         coords=coords,
@@ -38,7 +40,7 @@ def _prep_dss():
     ).expand_dims(species=["NO"])
     ds2 = xr.Dataset(
         data_vars={
-            "geo_id": (["time"], [b"00001_20000101T000001Z", b"00002_20000101T010001Z"]),
+            "geo_id": (["time"], GEO_IDS[[0, 2]]),
             "dof": (["time"], [40, 40]),
             "chi2": (["time"], [1.2, 1.2]),
             "target": (["altitude", "time"], [[3., 4.]], target_attrs),
@@ -46,17 +48,17 @@ def _prep_dss():
             "akm_diagonal": (["altitude", "time"], [[0.2, 0.3]]),
             "weights": ([], 1.0),
         },
-        coords=coords,
+        coords = {"time": TIMES[[0, 2]], "altitude": [50.]},
         attrs=global_attrs,
     ).expand_dims(species=["NO2"])
     ds3 = xr.Dataset(
         data_vars={
-            "geo_id": (["time"], [b"00001_20000101T000001Z", b"00002_20000101T010001Z"]),
-            "dof": (["time"], [50, 50]),
-            "chi2": (["time"], [1.3, 1.3]),
-            "target": (["altitude", "time"], [[-2., -1.]], target_attrs),
-            "target_noise_error": (["altitude", "time"], [[1., 2.]]),
-            "akm_diagonal": (["altitude", "time"], [[0.1, 0.2]]),
+            "geo_id": (["time"], GEO_IDS),
+            "dof": (["time"], [50, 50, 50]),
+            "chi2": (["time"], [1.3, 1.3, 1.3]),
+            "target": (["altitude", "time"], [[-2., -1.5, -1.]], target_attrs),
+            "target_noise_error": (["altitude", "time"], [[1., 1.5, 2.]]),
+            "akm_diagonal": (["altitude", "time"], [[0.1, 0.15, 0.2]]),
             "weights": ([], 2.0),
         },
         coords=coords,
