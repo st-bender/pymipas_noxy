@@ -75,8 +75,10 @@ if __name__ == "__main__":
         include_package_data=True,
         install_requires=[
             "numpy",
+            "scipy",
             "xarray",
             "netCDF4",
+            "click",
             "tomli",
         ],
         extras_require=extras_require,
