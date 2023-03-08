@@ -81,7 +81,11 @@ if __name__ == "__main__":
         ],
         extras_require=extras_require,
         scripts=[],
-        entry_points={},
+        entry_points={
+            "console_scripts": [
+                "mipas_noxy = mipas_noxy.__main__:main",
+            ]
+        },
         options={
             "bdist_wheel": {"universal": True},
         },
