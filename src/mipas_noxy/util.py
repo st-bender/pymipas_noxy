@@ -91,7 +91,7 @@ def _read_mipas_species(file, _s, _w, interp_alts=None, load_kwargs=None):
             #)
         else:
             _ds = _ds0
-        _ds = _ds.expand_dims(species=[_s])
+        _ds = _ds.expand_dims("species").assign_coords(species=[_s])
         _ds["weights"] = ("species", [_w])
         log_retr = (
             _ds.attrs["retrieval_in_logarithmic_parameter_space"].lower()
