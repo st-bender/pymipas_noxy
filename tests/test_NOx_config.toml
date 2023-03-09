@@ -1,0 +1,20 @@
+version = 1
+
+resolution = "R"
+
+[output]
+path = "tests/data"
+targets = ["NOx"]
+
+[input]
+path = "tests/data"
+
+[input.NOx]
+targets = ["NO", "NO2"]
+versions = ["261_0", "261_0"] 
+weights = [1, 1]
+
+[[times]]
+start = "20100401"
+end = "20100430"
+freq = "MS"
