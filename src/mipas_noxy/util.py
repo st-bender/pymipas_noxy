@@ -216,6 +216,19 @@ def fixup_target_name(ds, from_name, to_name):
     return ds
 
 
+def compat_drop_vars(ds, var):
+    """Backwards-compatible dropping of vairbales in the dataset
+
+    Just in case one or the other does not exist or gets removed
+    from the API.
+    """
+    try:
+        ds = ds.drop_vars(var)
+    except AttributeError:
+        ds = ds.drop(var)
+    return ds
+
+
 def fixup_altitudes(ds, alt_name="alt"):
     if alt_name not in ds.data_vars:
         info(
@@ -226,7 +239,7 @@ def fixup_altitudes(ds, alt_name="alt"):
     # drops the "altitude" coordinate variable first
     # if there is already one in the dataset
     if "altitude" in ds.coords:
-        ds = ds.drop_vars(["altitude"])
+        ds = compat_drop_vars(ds, ["altitude"])
     # the variable in `alt_name` should hold the
     # "original" time-dependent altitude coordinates,
     # rename it to be consistent with the input nc files.

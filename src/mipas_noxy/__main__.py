@@ -148,7 +148,8 @@ def main(
             debug("MIPAS v8 NOx/NOy ds: %s", mv8_noy)
 
             # drop unneeded variables
-            mv8_noy1 = mv8_noy.drop_vars(
+            mv8_noy1 = compat_drop_vars(
+                mv8_noy,
                 ["weights", "retrieval_in_logarithmic_parameter_space"]
             )
 
