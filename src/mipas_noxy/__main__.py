@@ -13,6 +13,7 @@
 import logging
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 import click
@@ -106,7 +107,7 @@ def main(
     else:
         times = config.get("times", [])
         tyms = [
-            set((_t.year, _t.month) for _t in xr.date_range(**t))
+            set((_t.year, _t.month) for _t in pd.date_range(**t))
             for t in times
         ]
         if not tyms:
