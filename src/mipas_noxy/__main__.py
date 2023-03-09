@@ -73,8 +73,11 @@ def main(
     dry_run,
     loglevel,
 ):
-    xr.set_options(keep_attrs=True)
-    xr.set_options(display_max_rows=1000, display_width=96)
+    try:
+        xr.set_options(keep_attrs=True)
+        xr.set_options(display_max_rows=1000, display_width=96)
+    except ValueError:
+        pass
     np.set_printoptions(precision=3)
 
     logger = logging.getLogger()
