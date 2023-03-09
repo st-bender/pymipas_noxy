@@ -37,7 +37,7 @@ def _prep_dss():
         },
         coords=coords,
         attrs=global_attrs,
-    ).expand_dims(species=["NO"])
+    ).expand_dims("species").assign_coords(species=["NO"])
     ds2 = xr.Dataset(
         data_vars={
             "geo_id": (["time"], GEO_IDS[[0, 2]]),
@@ -50,7 +50,7 @@ def _prep_dss():
         },
         coords = {"time": TIMES[[0, 2]], "altitude": [50.]},
         attrs=global_attrs,
-    ).expand_dims(species=["NO2"])
+    ).expand_dims("species").assign_coords(species=["NO2"])
     ds3 = xr.Dataset(
         data_vars={
             "geo_id": (["time"], GEO_IDS),
@@ -63,7 +63,7 @@ def _prep_dss():
         },
         coords=coords,
         attrs=global_attrs,
-    ).expand_dims(species=["N2O5"])
+    ).expand_dims("species").assign_coords(species=["N2O5"])
     return [ds1, ds2, ds3]
 
 
