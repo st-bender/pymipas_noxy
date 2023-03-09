@@ -17,7 +17,7 @@ import pandas as pd
 import xarray as xr
 
 import click
-import tomli
+import toml
 
 from .util import *
 
@@ -100,7 +100,7 @@ def main(
             config_file = configfile
 
     with open(config_file, mode="rb") as _fp:
-        config = tomli.load(_fp)
+        config = toml.loads(_fp.read().decode())
     debug("config: %s", config)
 
     # Time setup, command line takes precedence,

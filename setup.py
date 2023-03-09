@@ -79,7 +79,7 @@ if __name__ == "__main__":
             "xarray",
             "netCDF4",
             "click",
-            "tomli",
+            "toml",
         ],
         extras_require=extras_require,
         scripts=[],

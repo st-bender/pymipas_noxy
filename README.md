@@ -19,7 +19,7 @@ but the interface might still be subject to change.
 - `netCDF4` - required for reading netCDF files
 - `scipy` - required for the interpolation interface
 - `click` - required for the command line interface
-- `tomli` - required to read the configuration files
+- `toml` - required to read the configuration files
 - `pytest` - optional, for testing
 
 ### mipas_noxy
