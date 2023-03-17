@@ -18,9 +18,11 @@ from __future__ import absolute_import, division, print_function
 from logging import info, debug
 from os import path
 
-import netCDF4 as nc4
+import h5netcdf.legacyapi as nc4
 import numpy as np
 import xarray as xr
+
+from scipy.io import netcdf_file
 
 
 def get_nc_filename(l2_path, resolution, species, year, month, ext="nc", version="61"):
@@ -54,6 +56,33 @@ def open_mipas_l2(file, **kwargs):
     altitude coordinates so that the dataset can be easily
     processed with `xarray`.
     """
+    def _open_nc34(file):
+        try:
+            # try netcdf4 with h5netcdf first
+            _ds = nc4.Dataset(file, mode="r")
+        except (IOError, OSError):
+            # apparently a netcdf3 file, use scipy.io
+            _ds = netcdf_file(file, mmap=False)
+        return _ds
+
+    def _get_attrs(v):
+        if hasattr(v, "attrs"):
+            # h5netcdf netcdf4
+            attrs = v.attrs
+        else:
+            # netCDF4 just in case
+            attrs = v.__dict__
+            if "_attributes" in attrs:
+                # scipy.io netcdf3
+                attrs = attrs["_attributes"]
+        # at least scipy.io converts the attribute values to bytes,
+        # converts them back to be consistent with the others.
+        attrs.update({
+            k: _v.decode() for k, _v in attrs.items()
+            if type(_v) == bytes
+        })
+        return attrs
+
     # Drops the "altitude" variable since `xarray` can't handle
     # dimensions and variables with the same name but different dimensions
     mipv8_ds = xr.open_dataset(file, drop_variables=["altitude"], **kwargs)
@@ -62,7 +91,7 @@ def open_mipas_l2(file, **kwargs):
     if "timegrid" in mipv8_ds.dims:
         mipv8_ds = mipv8_ds.swap_dims({"timegrid": "time"})
     # Fix altitude naming and coordinates
-    nc4_ds = nc4.Dataset(file)
+    nc4_ds = _open_nc34(file)
     _alt = xr.DataArray(
         nc4_ds.variables["altitude"][:],
         dims=("altitude", "time"),
@@ -74,7 +103,7 @@ def open_mipas_l2(file, **kwargs):
     # Re-creates the original "altitude" variable but with a different name
     mipv8_ds["alt"] = _alt
     # Copies the attributes for the altitudes (now both of them)
-    alt_attrs = nc4_ds.variables["altitude"].__dict__
+    alt_attrs = _get_attrs(nc4_ds.variables["altitude"])
     mipv8_ds["alt"].attrs = alt_attrs
     mipv8_ds["altitude"].attrs = alt_attrs
     return mipv8_ds

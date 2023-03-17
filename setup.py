@@ -77,7 +77,7 @@ if __name__ == "__main__":
             "numpy",
             "scipy",
             "xarray",
-            "netCDF4",
+            "h5netcdf",
             "click",
             "toml",
         ],
