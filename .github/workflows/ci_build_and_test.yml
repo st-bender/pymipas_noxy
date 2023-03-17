@@ -51,11 +51,6 @@ jobs:
         run: |
           pip install -U pytest pytest-cov codecov coveralls
           pip install scrutinizer-ocular
-      - name: Install deps for old python versions
-        if: matrix.python-version == '2.7' || matrix.python-version == '3.5'
-        run: |
-          pip install "cftime<1.5.2"
-          pip install "netcdf4==1.5.3"
       - name: Downgrade importlib for Py37
         if: matrix.python-version == '3.7'
         run: |
