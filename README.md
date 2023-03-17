@@ -3,7 +3,7 @@
 **MIPAS NOx/NOy calculator tools**
 
 Some tools to handle MIPAS level-2 netCDF files,
-and to combine trace gase species to calculate
+and to combine trace gas species to calculate
 NOx (= NO + NO2) and NOy (= NO + NO2 + ClONO2 + N2O5 + HNO3 + HNO4)
 from the single species.
 
