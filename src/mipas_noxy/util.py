@@ -147,6 +147,8 @@ def read_mv8_species_v1(config, target, year, month, load_kwargs=None):
     w0 = weights[0]
     info("species: %s, version: %s, weight: %s", s0, v0, w0)
     file0 = get_nc_filename(input_path, _res, s0, year, month, version=v0)
+    if not path.exists(file0):
+        return None
     ds0 = _read_mipas_species(file0, s0, w0, load_kwargs=load_kwargs)
 
     # iterate over the rest
@@ -154,6 +156,8 @@ def read_mv8_species_v1(config, target, year, month, load_kwargs=None):
     for _s, _v, _w in zip(targets[1:], versions[1:], weights[1:]):
         info("species: %s, version: %s, weight: %s", _s, _v, _w)
         _file = get_nc_filename(input_path, _res, _s, year, month, version=_v)
+        if not path.exists(_file):
+            return None
         _ds = _read_mipas_species(_file, _s, _w, interp_alts=ds0.altitude, load_kwargs=load_kwargs)
         dsl.append(_ds)
     return dsl
