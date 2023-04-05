@@ -142,6 +142,8 @@ def main(
             # read species netcdfs into list
             mv8_noy_l = read_mv8_species_v1(config, out_target, year, month)
             debug("MIPAS v8 input list: %s", mv8_noy_l)
+            if not mv8_noy_l:
+                continue
 
             # combine into one data set
             mv8_noy_ds = combine_NOxy(mv8_noy_l)
