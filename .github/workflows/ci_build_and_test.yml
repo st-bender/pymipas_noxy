@@ -55,6 +55,10 @@ jobs:
         if: matrix.python-version == '3.7'
         run: |
           pip install "importlib-metadata<5"
+      - name: Downgrade pandas for Py38
+        if: matrix.python-version == '3.8'
+        run: |
+          pip install "pandas<2"
       - name: Install package
         run: |
           pip install -e ".[all]"
