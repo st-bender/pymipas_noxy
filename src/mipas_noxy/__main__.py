@@ -143,7 +143,7 @@ def main(
             mv8_noy_l = read_mv8_species_v1(config, out_target, year, month)
             # interpolate to first (NO) altitudes
             mv8_noy_l = [mv8_noy_l[0]] + [
-                _d.interp(altitude=mv8_noy_l[0].altitude, method="linear")
+                interp_altitude(_d, altitude=mv8_noy_l[0].altitude, method="linear")
                 for _d in mv8_noy_l[1:]
             ]
             debug("MIPAS v8 input list: %s", mv8_noy_l)
