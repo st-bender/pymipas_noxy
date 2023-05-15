@@ -111,15 +111,7 @@ def open_mipas_l2(file, **kwargs):
 
 def _read_mipas_species(file, _s, _w, interp_alts=None, load_kwargs=None):
     debug("%s %s", file, path.exists(file))
-    with open_mipas_l2(file, **load_kwargs) as _ds0:
-        if interp_alts is not None:
-            _ds = _ds0.interp(altitude=interp_alts)
-            # overwrite `target_noise_error` with the squared interpolation
-            #_ds["target_noise_error"] = np.sqrt(
-            #    (_ds0.target_noise_error**2).interp(altitude=interp_alts)
-            #)
-        else:
-            _ds = _ds0
+    with open_mipas_l2(file, **load_kwargs) as _ds:
         _ds = _ds.expand_dims("species").assign_coords(species=[_s])
         _ds["weights"] = ("species", [_w])
         log_retr = (
@@ -158,7 +150,7 @@ def read_mv8_species_v1(config, target, year, month, load_kwargs=None):
         _file = get_nc_filename(input_path, _res, _s, year, month, version=_v)
         if not path.exists(_file):
             return None
-        _ds = _read_mipas_species(_file, _s, _w, interp_alts=ds0.altitude, load_kwargs=load_kwargs)
+        _ds = _read_mipas_species(_file, _s, _w, load_kwargs=load_kwargs)
         dsl.append(_ds)
     return dsl
 
