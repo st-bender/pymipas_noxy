@@ -133,19 +133,10 @@ def read_mv8_species_v1(config, target, year, month, load_kwargs=None):
     targets = spec_conf.get("targets", [])
     versions = spec_conf.get("versions", [])
     weights = spec_conf.get("weights", [])
-    # load first dataset
-    s0 = targets[0]
-    v0 = versions[0]
-    w0 = weights[0]
-    info("species: %s, version: %s, weight: %s", s0, v0, w0)
-    file0 = get_nc_filename(input_path, _res, s0, year, month, version=v0)
-    if not path.exists(file0):
-        return None
-    ds0 = _read_mipas_species(file0, s0, w0, load_kwargs=load_kwargs)
 
-    # iterate over the rest
-    dsl = [ds0]
-    for _s, _v, _w in zip(targets[1:], versions[1:], weights[1:]):
+    # iterate over the targets
+    dsl = []
+    for _s, _v, _w in zip(targets, versions, weights):
         info("species: %s, version: %s, weight: %s", _s, _v, _w)
         _file = get_nc_filename(input_path, _res, _s, year, month, version=_v)
         if not path.exists(_file):
