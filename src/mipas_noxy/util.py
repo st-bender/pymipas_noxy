@@ -109,6 +109,16 @@ def open_mipas_l2(file, **kwargs):
     return mipv8_ds
 
 
+def interp_altitude(ds, interp_error=False, **kwargs):
+    ret = ds.interp(**kwargs)
+    if interp_error:
+        # overwrite `target_noise_error` with the squared interpolation
+        ret["target_noise_error"] = np.sqrt(
+            (ds.target_noise_error**2).interp(**kwargs)
+        )
+    return ret
+
+
 def _read_mipas_species(file, _s, _w, interp_alts=None, load_kwargs=None):
     debug("%s %s", file, path.exists(file))
     with open_mipas_l2(file, **load_kwargs) as _ds:
