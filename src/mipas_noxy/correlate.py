@@ -61,6 +61,7 @@ def histogram2d_colwise(ds, x, y, x_edges, y_edges, density=False):
             coords={y_binv: y_ctr},
         )
     )
+    ret[y_binv].attrs = ds[y].attrs
     return ret
 
 
@@ -111,6 +112,8 @@ def histogram2d(ds, x, y, x_edges, y_edges, density=False):
         dims=(x_binv, y_binv,),
         coords={x_binv: x_ctr, y_binv: y_ctr}
     )
+    ret[x_binv].attrs = ds[x].attrs
+    ret[y_binv].attrs = ds[y].attrs
     return ret
 
 
@@ -171,6 +174,8 @@ def histogram2d_kde(
         dims=(x_binv, y_binv,),
         coords={x_binv: x_ctr, y_binv: y_ctr}
     )
+    ret[x_binv].attrs = ds[x].attrs
+    ret[y_binv].attrs = ds[y].attrs
     return ret
 
 
