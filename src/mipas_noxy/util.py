@@ -223,6 +223,14 @@ def calculate_NOxy(ds, dim="species", keep_attrs=True):
     return mv8_noxy
 
 
+# from v81, 25 Apr 2023 of
+# https://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
+STD_NAMES = {
+	"NOX": "mole_fraction_of_nox_expressed_as_nitrogen_in_air",
+	"NOY": "mole_fraction_of_noy_expressed_as_nitrogen_in_air",
+}
+
+
 def fixup_target_name(ds, from_name, to_name):
     # We are going to overwrite things, so make a copy first.
     ds = ds.copy()
@@ -233,8 +241,8 @@ def fixup_target_name(ds, from_name, to_name):
         _sn = _attrs.get("standard_name", None)
         if _ln and from_name in _ln:
             _attrs["long_name"] = _ln.replace(from_name, to_name)
-            if _sn:
-                del _attrs["standard_name"]
+        if _sn and _sn.startswith("mole_fraction"):
+            _attrs["standard_name"] = STD_NAMES[to_name.upper()]
     # replace in global attributes
     for _k, _v in ds.attrs.items():
         if from_name in _v:
