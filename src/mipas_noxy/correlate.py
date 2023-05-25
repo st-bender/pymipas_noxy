@@ -203,7 +203,7 @@ def xy_interpolate_to_zero(ds, bin_var, **kwargs):
 
 # %%
 def hist_mean(hist_da, x_var, y_var, min_hpts=50):
-    _h_mean = (hist_da[y_var].data * hist_da).sum(y_var) / hist_da.sum(y_var)
+    _h_mean = (hist_da[y_var] * hist_da).sum(y_var) / hist_da.sum(y_var)
     _hist_mean = xr.where(hist_da.sum(y_var) >= min_hpts, _h_mean, np.nan)
     debug("mean: %s", _hist_mean)
     return xy_interpolate_to_zero(_hist_mean, x_var, method="linear")
@@ -216,7 +216,7 @@ def hist_median(hist_da, x_var, y_var, min_hpts=50):
     for _i in range(_hcsum.shape[0]):
         _ix.append(np.searchsorted(_hcsum[_i], 0.5 * hist_da.sum(y_var)[_i]))
     _h_median = hist_da.isel({y_var: _ix})[y_var]
-    _h_median[x_var] = (y_var, hist_da[x_var].data)
+    _h_median[x_var] = (y_var, hist_da[x_var].data, hist_da[x_var].attrs)
     _h_median = _h_median.swap_dims({y_var: x_var})
 
     _hist_median = xr.where(hist_da.sum(y_var) >= min_hpts, _h_median, np.nan)
