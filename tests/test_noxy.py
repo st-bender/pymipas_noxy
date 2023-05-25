@@ -84,4 +84,5 @@ def test_fixup_target_name():
     noxy = _prep_dss()[0]
     noxy = fixup_target_name(noxy, "NO", "NOY")
     assert noxy.target.attrs["long_name"] == "volume mixing ratio of NOY"
+    assert noxy.target.attrs["standard_name"] == "mole_fraction_of_noy_expressed_as_nitrogen_in_air"
     assert noxy.attrs["retrieval_target_name"] == "NOY"
