@@ -230,3 +230,13 @@ def hist_mode(hist_da, x_var, y_var, min_hpts=50):
     _hist_mode = xr.where(hist_da.sum(y_var) >= min_hpts, _h_mode, np.nan)
     debug("mode: %s", _hist_mode)
     return xy_interpolate_to_zero(_hist_mode, x_var, method="linear")
+
+
+# %%
+def hist_var(hist_da, x_var, y_var, min_hpts=0):
+    _nh = hist_da.sum(y_var)
+    _h_mean = (hist_da[y_var] * hist_da).sum(y_var) / _nh
+    _h_var = ((hist_da[y_var] - _h_mean)**2 * hist_da).sum(y_var) / (_nh - 1)
+    _hist_var = xr.where(hist_da.sum(y_var) >= min_hpts, _h_var, np.nan)
+    debug("var: %s", _hist_var)
+    return _hist_var
