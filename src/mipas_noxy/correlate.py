@@ -202,7 +202,7 @@ def xy_interpolate_to_zero(ds, bin_var, **kwargs):
 
 
 # %%
-def hist_mean(hist_da, x_var, y_var, min_hpts=50):
+def hist_mean(hist_da, x_var, y_var, min_hpts=0):
     _h_mean = (hist_da[y_var] * hist_da).sum(y_var) / hist_da.sum(y_var)
     _hist_mean = xr.where(hist_da.sum(y_var) >= min_hpts, _h_mean, np.nan)
     debug("mean: %s", _hist_mean)
@@ -210,7 +210,7 @@ def hist_mean(hist_da, x_var, y_var, min_hpts=50):
 
 
 # %%
-def hist_median(hist_da, x_var, y_var, min_hpts=50):
+def hist_median(hist_da, x_var, y_var, min_hpts=0):
     _hcsum = hist_da.cumsum(y_var)
     _ix = []
     for _i in range(_hcsum.shape[0]):
@@ -225,7 +225,7 @@ def hist_median(hist_da, x_var, y_var, min_hpts=50):
 
 
 # %%
-def hist_mode(hist_da, x_var, y_var, min_hpts=50):
+def hist_mode(hist_da, x_var, y_var, min_hpts=0):
     _h_mode = hist_da.isel({y_var: hist_da.argmax(y_var)})[y_var]
     _hist_mode = xr.where(hist_da.sum(y_var) >= min_hpts, _h_mode, np.nan)
     debug("mode: %s", _hist_mode)
