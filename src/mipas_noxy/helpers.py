@@ -278,7 +278,25 @@ def calc_noy_bg_epp(
 
     ## %%
     hist_sds = hist_stats_ds(_hist_da, ch4_var, noy_var, min_pts=0, min_tot=40)
-    _hist_mean = hist_sds["mean"]
+    hist_sds.attrs = {
+        "Altitude range [km]": corr_alts,
+        "Latitude range [degrees_north]": corr_lats,
+        "CH4 threshold used [ppm]": ch4_thresh or "none",
+        "CO threshold used [ppm]": co_thresh or "none",
+        "AKM diagonal threshold used [1]": akm_thresh or "none",
+        "Potential temperature threshold used [K]": tpot_thresh or "none",
+    }
+    return hist_sds
+
+
+# %%
+def sub_bg_noy(
+    ds, h_sds,
+    ch4_var, co_var, noy_var,
+    co_thresh=None,
+):
+    ch4_binv = f"{ch4_var}_bins"
+    _hist_mean = h_sds["mean"]
     logger.debug(_hist_mean)
 
     _noy_bg = _hist_mean.rename(
@@ -307,17 +325,8 @@ def calc_noy_bg_epp(
     ret[epp_name].attrs = {
         "long_name": "volume mixing ratio of EPP NOy", "units": "ppm",
     }
-
-    ret.attrs = {
-        "Altitude range [km]": corr_alts,
-        "Latitude range [degrees_north]": corr_lats,
-        "CH4 threshold used [ppm]": ch4_thresh or "none",
-        "CO threshold used [ppm]": co_thresh or "none",
-        "AKM diagonal threshold used [1]": akm_thresh or "none",
-        "Potential temperature threshold used [K]": tpot_thresh or "none",
-    }
-    hist_da.attrs.update(ret.attrs)
-    return hist_da, ret
+    ret.attrs.update(h_sds.attrs)
+    return ret
 
 
 # %%
