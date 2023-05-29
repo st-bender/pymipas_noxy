@@ -228,7 +228,7 @@ def hist_stats_ds(hist_da, ch4_var, noy_var, min_pts=0, min_tot=0):
 def calc_noy_bg_epp(
     ds, ch4_var, co_var, noy_var,
     ch4_bin_edges, noy_bin_edges,
-    corr_alts=(None, None), corr_lats=(-91., 91.),
+    alt_range=(None, None), lat_range=(-91., 91.),
     akm_thresh=None,
     ch4_thresh=None,
     co_thresh=None,
@@ -236,6 +236,8 @@ def calc_noy_bg_epp(
     min_pts=0,
     copy_vars=["latitude", "lat_bnds", "longitude", "lon_bnds", "time_bnds"],
 ):
+    corr_alts = alt_range
+    corr_lats = lat_range
     # noy_binv = f"{noy_var}_bins"
     ch4_binv = f"{ch4_var}_bins"
     # select altitude
