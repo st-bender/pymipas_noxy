@@ -217,6 +217,7 @@ def hist_stats_ds(hist_da, ch4_var, noy_var, min_pts=0, min_tot=0):
         "median": _hist_median.to_unit("ppm"),
         "mean": _hist_mean.to_unit("ppm"),
         "std": (ch4_binv, np.sqrt(_hist_var), _hist_mean.to_unit("ppm").attrs),
+        "histogram": hist_da,
     })
     # ret = ret.where(ret.npts > min_tot)
     ret.attrs.update(hist_da.attrs)
