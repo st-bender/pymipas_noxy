@@ -330,14 +330,14 @@ def sub_bg_noy(
 
 
 # %%
-def plot_corr_hist(hist_da, ch4_var, noy_var, cmap="jet", min_pts=0):
+def plot_corr_hist(hist_sds, ch4_var, noy_var, cmap="jet", min_pts=0):
     # ch4_binv = ch4_var + "_bins"
     noy_binv = noy_var + "_bins"
     # contour levels
     lx = np.exp(np.arange(21) * 0.25 + 15) / np.exp(20) * 0.3
 
+    hist_da = hist_sds["histogram"]
     _hist_da = xr.where(hist_da >= min_pts, hist_da, 0.)
-    hist_sds = hist_stats_ds(_hist_da, ch4_var, noy_var, min_pts=0, min_tot=40)
     _hist_mean = hist_sds["mean"]
     _hist_median = hist_sds["median"]
     _hist_mode = hist_sds["mode"]
