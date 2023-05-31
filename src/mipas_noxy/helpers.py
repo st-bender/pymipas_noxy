@@ -239,8 +239,6 @@ def calc_noy_bg_epp(
 ):
     corr_alts = alt_range
     corr_lats = lat_range
-    # noy_binv = f"{noy_var}_bins"
-    ch4_binv = f"{ch4_var}_bins"
     # select altitude
     _ds = ds.sel(altitude=slice(*corr_alts))
     # select latitude
