@@ -226,6 +226,18 @@ def hist_stats_ds(hist_da, ch4_var, noy_var, min_pts=0, min_tot=0):
 
 
 # %%
+def potential_temperature(pressure, temperature):
+    tpot = temperature / ((pressure / (1000. * au.hPa))**(0.286))
+    tpot = tpot.to_unit("K")
+    tpot.attrs.update({
+        "long_name": "Potential temperature",
+        "standard_name": "air_potential_temperature",
+        "reference_pressure": "1000 hPa",
+    })
+    return tpot
+
+
+# %%
 def calc_noy_bg_epp(
     ds, ch4_var, co_var, noy_var,
     ch4_bin_edges, noy_bin_edges,
