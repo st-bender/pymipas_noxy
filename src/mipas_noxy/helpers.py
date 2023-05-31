@@ -270,7 +270,10 @@ def calc_noy_bg_epp(
         _ds = _ds.where((_ds["akm_diagonal"] > akm_thresh), drop=True)
     if tpot_thresh is not None:
         logger.info("selecting by potential temperature > %g", tpot_thresh)
-        _tpot = potential_temperature(_ds.pressure, _ds.temperature)
+        if "T_pot" in ds.data_vars:
+            _tpot = ds["T_pot"]
+        else:
+            _tpot = potential_temperature(_ds.pressure, _ds.temperature)
         _ds = _ds.where((_tpot > tpot_thresh), drop=True)
     for v in copy_vars:
         _ds[v] = ds[v] 
