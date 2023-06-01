@@ -53,6 +53,7 @@ def trans_tpot(ds, arange=(22, 44)):
 def epp_noy_single(
     _mv8_sel,
     corr_ds,
+    ch4_var, co_var, noy_var,
     co_high=0.7,
     co_low=0.07,
     co_ch4_min=0.0175,
@@ -67,12 +68,12 @@ def epp_noy_single(
     _lat = _mv8_sel.latitude
     _id = _mv8_sel[dim].values
     _noy_ch4 = corr_ds.sel({dim: _id})
-    _mv8_ch4 = _mv8_sel[ivar]
-    _mv8_co = _mv8_sel.vmr_co
-    _mv8_noy = _mv8_sel.vmr_noy
+    _mv8_ch4 = _mv8_sel[ch4_var]
+    _mv8_co = _mv8_sel[co_var]
+    _mv8_noy = _mv8_sel[noy_var]
     _mv8_coch4 = _mv8_co * _mv8_ch4
     _mv8_tpot = _mv8_sel.T_pot
-    _bg_noy = _noy_ch4.interp({ivar: _mv8_ch4}).reset_coords()["mean"]
+    _bg_noy = _noy_ch4.interp({ch4_var: _mv8_ch4}).reset_coords()["mean"]
     _epp_noy0 = _mv8_noy - _bg_noy
     if tpot_limits is None:
         _potn = trans_tpot(_mv8_sel, arange=(22, 44))
@@ -138,21 +139,21 @@ def _noy_co_ratio(ds, tpot_thr, eppnoy, co, dim="geo_id"):
 # %%
 def epp_noy_multi(
     _mv8_sel, corr_ds,
+    ch4_var, co_var, noy_var,
     co_high=0.7,
     co_low=0.07,
     co_ch4_min=0.0175,
     ch4_fac=0.026,
     ch4_const=0.012,
     dim="geo_id",
-    ivar="vmr_ch4",
     tpot_limits=None,
 ):
     """Background and EPP NOy calculation for multiple profiles
     """
     _lat = _mv8_sel.latitude
-    _mv8_ch4 = _mv8_sel[ivar]
-    _mv8_co = _mv8_sel.vmr_co
-    _mv8_noy = _mv8_sel.vmr_noy
+    _mv8_ch4 = _mv8_sel[ch4_var]
+    _mv8_co = _mv8_sel[co_var]
+    _mv8_noy = _mv8_sel[noy_var]
     _mv8_coch4 = _mv8_co * _mv8_ch4
     _mv8_tpot = _mv8_sel.T_pot
     _bg_noy = corr_ds["mean"]
@@ -202,62 +203,81 @@ def epp_noy_multi(
 
 
 # %%
-def process_day_single(ds, corr_ds, dim="geo_id", ivar="vmr_ch4", **kwargs):
+def process_day_single(
+    ds, corr_ds,
+    ch4_var, co_var, noy_var,
+    dim="geo_id",
+    **kwargs,
+):
     corr_ds_sel = corr_ds.sel(
         time=ds.time.dt.floor("D"),
         latitude=ds.latitude,
         method="nearest",
     )
-    if ivar + "_bins" in corr_ds_sel.dims:
-        corr_ds_sel = corr_ds_sel.rename({ivar + "_bins": ivar})
+    if ch4_var + "_bins" in corr_ds_sel.dims:
+        corr_ds_sel = corr_ds_sel.rename({ch4_var + "_bins": ch4_var})
     epp_noy_da = ds.groupby(dim).map(
         epp_noy_single,
-        args=(corr_ds_sel,),
-        dim=dim, ivar=ivar,
+        args=(corr_ds_sel, ch4_var, co_var, noy_var),
+        dim=dim,
         **kwargs,
     )
     return epp_noy_da
 
 
 # %%
-def process_day_multi1(ds, corr_ds, dim="geo_id", ivar="vmr_ch4", **kwargs):
+def process_day_multi1(
+    ds, corr_ds,
+    ch4_var, co_var, noy_var,
+    dim="geo_id",
+    **kwargs,
+):
     corr_ds_sel = corr_ds.sel(
         time=ds.time.dt.floor("D"),
         latitude=ds.latitude,
         method="nearest",
     )
-    if ivar + "_bins" in corr_ds_sel.dims:
-        corr_ds_sel = corr_ds_sel.rename({ivar + "_bins": ivar})
+    if ch4_var + "_bins" in corr_ds_sel.dims:
+        corr_ds_sel = corr_ds_sel.rename({ch4_var + "_bins": ch4_var})
     corr_ds_i = corr_ds_sel.groupby(dim).map(
         lambda _ds: _ds.interp({
-            ivar: ds[ivar].sel({dim: _ds[dim]})
+            ch4_var: ds[ch4_var].sel({dim: _ds[dim]})
         }).reset_coords()
     )
-    epp_noy_da = epp_noy_multi(ds, corr_ds_i, ivar=ivar, **kwargs)
+    epp_noy_da = epp_noy_multi(ds, corr_ds_i, ch4_var, co_var, noy_var, **kwargs)
     return epp_noy_da
 
 
 # %%
-def process_day_multi2(ds, corr_ds, ivar="vmr_ch4", **kwargs):
+def process_day_multi2(
+    ds, corr_ds,
+    ch4_var, co_var, noy_var,
+    **kwargs,
+):
     _ti = np.unique(ds.time.dt.floor("D"))
     corr_ds_sel = corr_ds.sel(time=_ti[0])
-    if ivar + "_bins" in corr_ds_sel.dims:
-        corr_ds_sel = corr_ds_sel.rename({ivar + "_bins": ivar})
+    if ch4_var + "_bins" in corr_ds_sel.dims:
+        corr_ds_sel = corr_ds_sel.rename({ch4_var + "_bins": ch4_var})
     # _ds = ds.swap_dims({"geo_id": "time"}).reset_coords()
     _ds = ds.copy()
     corr_ds_i = xr.where(
         _ds.latitude <= 0,
-        corr_ds_sel.sel(latitude=-45).interp({ivar: _ds[ivar]}),
-        corr_ds_sel.sel(latitude=45).interp({ivar: _ds[ivar]}),
+        corr_ds_sel.sel(latitude=-45).interp({ch4_var: _ds[ch4_var]}),
+        corr_ds_sel.sel(latitude=45).interp({ch4_var: _ds[ch4_var]}),
     )
-    epp_noy_da = epp_noy_multi(_ds, corr_ds_i, ivar=ivar, **kwargs)
+    epp_noy_da = epp_noy_multi(_ds, corr_ds_i, ch4_var, co_var, noy_var, **kwargs)
     return epp_noy_da
 
 
 # %%
-def epp_tot_day(ds, corr_ds, dlat=5.0, ivar="vmr_ch4", name="vmr_noy_epp", **kwargs):
-    epp_noy = process_day_multi2(ds, corr_ds, iver=ivar, **kwargs)
-    mrg_ds = xr.merge([ds, epp_noy.drop(ivar).rename(name)])
+def epp_tot_day(
+    ds, corr_ds,
+    ch4_var, co_var, noy_var,
+    dlat=5.0, name="vmr_noy_epp",
+    **kwargs,
+):
+    epp_noy = process_day_multi2(ds, corr_ds, ch4_var, co_var, noy_var, **kwargs)
+    mrg_ds = xr.merge([ds, epp_noy.drop(ch4_var).rename(name)])
     dzm_tds = calc_Ntot(mrg_ds, dlat=dlat)
     return dzm_tds
 
