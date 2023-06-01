@@ -67,9 +67,13 @@ def g_weights(xs, μ, σ):
 # %%
 def smooth_targets(a, b):
     # cap altitude range to the one common to both
-    aa = a.sel(altitude=slice(0, np.minimum(a.altitude.max(), b.altitude.max())))
+    # aa = a.sel(altitude=slice(0, np.minimum(a.altitude.max(), b.altitude.max())))
+    aa = a
     vr_a = aa.vr_row
-    vr_b = b.vr_row.interp(altitude=aa.altitude)
+    vr_b = b.vr_row.interp(
+        altitude=aa.altitude,
+        kwargs=dict(bounds_error=False, fill_value=0.),
+    )
     _vr_diffsq = (vr_a**2 - vr_b**2)
     # _vr_diffsq = (vr_a**2)
     vr_diff = xr.where(_vr_diffsq > 0., np.sqrt(_vr_diffsq), 1e-12)
