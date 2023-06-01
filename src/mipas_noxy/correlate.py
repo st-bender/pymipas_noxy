@@ -59,6 +59,7 @@ def histogram2d_colwise(ds, x, y, x_edges, y_edges, density=False):
             np.histogram(d[y], bins=y_edges, density=density)[0],
             dims=(y_binv,),
             coords={y_binv: y_ctr},
+            attrs={"long_name": "number of data points", "units": "1"},
         )
     )
     ret[y_binv].attrs = ds[y].attrs
@@ -110,7 +111,8 @@ def histogram2d(ds, x, y, x_edges, y_edges, density=False):
     ret = xr.DataArray(
         _hist[0],
         dims=(x_binv, y_binv,),
-        coords={x_binv: x_ctr, y_binv: y_ctr}
+        coords={x_binv: x_ctr, y_binv: y_ctr},
+        attrs={"long_name": "number of data points", "units": "1"},
     )
     ret[x_binv].attrs = ds[x].attrs
     ret[y_binv].attrs = ds[y].attrs
@@ -172,7 +174,8 @@ def histogram2d_kde(
     ret = xr.DataArray(
         kde_eval.reshape(pX.shape).T,
         dims=(x_binv, y_binv,),
-        coords={x_binv: x_ctr, y_binv: y_ctr}
+        coords={x_binv: x_ctr, y_binv: y_ctr},
+        attrs={"long_name": "number of data points", "units": "1"},
     )
     ret[x_binv].attrs = ds[x].attrs
     ret[y_binv].attrs = ds[y].attrs
