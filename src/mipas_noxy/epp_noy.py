@@ -112,7 +112,7 @@ def epp_noy_single(
         )
     _epp_noy = xr.where(_mv8_sel.altitude > 20., _epp_noy, 0.)
     _epp_noy.attrs.update({
-        "long_name": "volume mixing ratio of EPP-NOY",
+        "long_name": "volume mixing ratio of EPP NOy",
     })
     logger.debug(_epp_noy)
     return _epp_noy
@@ -196,7 +196,7 @@ def epp_noy_multi(
     )
     _epp_noy = xr.where(_mv8_sel.altitude > 20., _epp_noy, 0.)
     _epp_noy.attrs.update({
-        "long_name": "volume mixing ratio of EPP-NOY",
+        "long_name": "volume mixing ratio of EPP NOy",
     })
     logger.debug(_epp_noy)
     return _epp_noy
