@@ -1,0 +1,119 @@
+version = 1
+
+resolution = "R"
+# resolution = "H"
+
+[output]
+netcdf = false
+# path = "."
+# single target
+targets = ["epp_noy"]
+
+[input]
+path = "./MIPAS_NOY/"
+
+[input.epp_noy]
+targets = ["NOY", "CH4", "CO"]
+versions = ["261", "261", "261"]  # resolution = R
+# versions = ["61", "61", "61"]  # resolution = H
+weights = [1, 1, 1]
+
+[correlation.thresholds]
+akm_thresh = 0.003
+co_thresh = 0.1
+# tpot_thresh = 1000
+min_pts = 15  # minimum points per histogram bin
+
+[correlation.region]
+# SH
+alt_range = [30.0, 70.0]
+lat_range = [-45.0, 0.0]
+
+#[correlation.region]
+# NH
+# alt_range = [30.0, 70.0]
+# lat_range = [0.0, 45.0]
+
+[correlation.bins]
+# from IDL code for MIPAS
+ch4_bin_width = 0.0003875  # 0.031 / 80
+# ch4_bin_min = -0.005
+ch4_bin_min = -0.004875
+ch4_nbins = 80
+# multiply by (num / den)
+ch4_bin_den = 0.014
+ch4_bin_num = 1
+# %%
+noy_bin_width = 0.0004375  # 0.035 / 80
+# noy_bin_min = -0.005
+noy_bin_min = -0.004875
+noy_nbins = 80
+# multiply by (num / den)
+noy_bin_den = 1
+noy_bin_num = 1
+
+[epp_noy]
+# uncomment if available to skip calculating every time
+# bg_file = "epp_noy_hist_mipasv8_200207-201204_co010_ak0003_cubic_SN.nc"
+
+[epp_noy.sub]
+# for subtraction
+co_high=0.7
+co_low=0.07
+co_ch4_min=0.0175
+ch4_fac=0.026
+ch4_const=0.012
+# potential temperature limits
+# comment or remove to have the limit calculated based on the minimum NOy/CH4
+# for SH per month, NH will be rotated forward by 6 months
+tpot_limits = [3200, 3200, 3000, 2300, 1900, 1200, 1000, 800, 700, 600, 600, 3200]
+
+[epp_noy.sum]
+# for integration/summing the zonal means to calculate the total (EPP)NOy
+arange = [25, 70]
+lrange = [-90, 0]
+# Either uses a CO threshold for summing
+co_thresh = 0.025
+# or tries to find the minimum NOy/CH4 ratio
+asearch_max = 44  # between arange[0] and asearch_max
+lsearch_num = 3  # and averages lsearch_num latitude bins
+method = "minimum"  # or "gradient" for the (minimum) gradient
+
+[figures]
+cmap = "cividis"
+path = "./fig_cividis"
+style = "./publication.style"
+plot_alts = [20.0, 80.0]
+plot_lats = [-90.0, 0.0]
+# plot_lats = [0.0, 90.0]
+zm_dlat = 5.0
+format = "pdf"
+# suffix = "_co005_ak0000"
+suffix = "auto"
+types = ["hist", "zm"]
+
+# one month
+[[times]]
+start = "20100501"
+end = "20100531"
+freq = "MS"
+
+## multiple months
+#[[times]]
+#start = "20110501"
+#end = "20110831"
+#freq = "MS"
+
+## resolution = R
+## multiple years
+#[[times]]
+#start = "20041101"
+#end = "20120430"
+#freq = "MS"
+
+## resolution = H
+## multiple years
+#[[times]]
+#start = "20020601"
+#end = "20041031"
+#freq = "MS"
