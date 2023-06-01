@@ -60,7 +60,7 @@ def epp_noy_single(
     ch4_const=0.012,
     dim="geo_id",
     ivar="vmr_ch4",
-    pxs=None,
+    tpot_limits=None,
 ):
     """Background and EPP NOy calculation for a single profile
     """
@@ -74,13 +74,13 @@ def epp_noy_single(
     _mv8_tpot = _mv8_sel.T_pot
     _bg_noy = _noy_ch4.interp({ivar: _mv8_ch4}).reset_coords()["mean"]
     _epp_noy0 = _mv8_noy - _bg_noy
-    if pxs is None:
+    if tpot_limits is None:
         _potn = trans_tpot(_mv8_sel, arange=(22, 44))
         _pots = _potn
     else:
         _mv8_mnth = _mv8_sel.time.dt.month.values
-        _potn = pxs[(_mv8_mnth + 6 - 1) % 12]
-        _pots = pxs[_mv8_mnth - 1]
+        _potn = tpot_limits[(_mv8_mnth + 6 - 1) % 12]
+        _pots = tpot_limits[_mv8_mnth - 1]
     _epp_noy = xr.zeros_like(_mv8_noy)
     # high CO => all NOy is considered from EPP
     cond1 = (_mv8_co > co_high) | (_mv8_noy > (ch4_const + _mv8_ch4 * ch4_fac))
@@ -145,7 +145,7 @@ def epp_noy_multi(
     ch4_const=0.012,
     dim="geo_id",
     ivar="vmr_ch4",
-    pxs=None,
+    tpot_limits=None,
 ):
     """Background and EPP NOy calculation for multiple profiles
     """
@@ -158,13 +158,13 @@ def epp_noy_multi(
     _bg_noy = corr_ds["mean"]
     _epp_noy0 = _mv8_noy - _bg_noy
 
-    if pxs is None:
+    if tpot_limits is None:
         _potn = trans_tpot(_mv8_sel, arange=(22, 44))
         _pots = _potn
     else:
         _mv8_mnth = _mv8_sel.time.dt.month.values[0]
-        _potn = pxs[(_mv8_mnth + 6 - 1) % 12]
-        _pots = pxs[_mv8_mnth - 1]
+        _potn = tpot_limits[(_mv8_mnth + 6 - 1) % 12]
+        _pots = tpot_limits[_mv8_mnth - 1]
     _ratio_n = _noy_co_ratio(_mv8_sel, _potn, _epp_noy0, _mv8_co, dim=dim)
     _ratio_s = _noy_co_ratio(_mv8_sel, _pots, _epp_noy0, _mv8_co, dim=dim)
 
