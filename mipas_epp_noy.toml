@@ -24,12 +24,12 @@ co_thresh = 0.1
 # tpot_thresh = 1000
 min_pts = 15  # minimum points per histogram bin
 
-[correlation.region]
+[[correlation.region]]
 # SH
 alt_range = [30.0, 70.0]
 lat_range = [-45.0, 0.0]
 
-#[correlation.region]
+#[[correlation.region]]
 # NH
 # alt_range = [30.0, 70.0]
 # lat_range = [0.0, 45.0]
