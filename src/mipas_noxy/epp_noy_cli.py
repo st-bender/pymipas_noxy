@@ -306,6 +306,7 @@ def main(
             if out_conf.get("netcdf", False):
                 cnc_fname = f"{out_target}_combined_mipasv8_{date}.nc"
                 cnc_fpname = path.join(out_path, cnc_fname)
+                combined.time.encoding["units"] = "days since 2000-01-01"
                 combined.to_netcdf(cnc_fpname) #, unlimited_dims=["geo_id"])
                 info("Combined data set saved to: %s", cnc_fpname)
 
@@ -393,6 +394,7 @@ def main(
             if bg_file is None and out_conf.get("netcdf", False):
                 hnc_fname = f"{out_target}_hist_mipasv8_{date}{fig_suff}.nc"
                 hnc_fpname = path.join(out_path, hnc_fname)
+                hh_ds.time.encoding["units"] = "days since 2000-01-01"
                 hh_ds.to_netcdf(hnc_fpname, unlimited_dims=["time"])
                 info("Histogram statsitics saved to: %s", hnc_fpname)
 
