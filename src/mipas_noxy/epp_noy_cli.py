@@ -406,7 +406,15 @@ def main(
                 integrate_eppnoy,
                 **config.get(out_target, {}).get("sum", {})
             ).T
-            info(epp_noy_tot.to_unit("Gmol"))
+            epp_noy_tot = epp_noy_tot.to_unit("Gmol")
+            info("Daily hemispheric EPP-NOy: %s", epp_noy_tot)
+            tnc_fname = f"{out_target}_Ntot_mipasv8_{date}{fig_suff}.nc"
+            tnc_fpname = path.join(out_path, tnc_fname)
+            epp_noy_tot.time.encoding["units"] = "days since 2000-01-01"
+            epp_noy_tot.to_dataset().to_netcdf(
+                tnc_fpname, unlimited_dims=["time"],
+            )
+            info("Daily hemispheric EPP-NOy saved to: %s", tnc_fpname)
 
     return 0
 
