@@ -257,17 +257,17 @@ def process_day_multi2(
     **kwargs,
 ):
     _ti = np.unique(ds.time.dt.floor("D"))
-    corr_ds_sel = corr_ds.sel(time=_ti[0])
+    corr_ds_sel = corr_ds.sel(time=_ti[0], method="nearest")
     if ch4_var + "_bins" in corr_ds_sel.dims:
         corr_ds_sel = corr_ds_sel.rename({ch4_var + "_bins": ch4_var})
     # _ds = ds.swap_dims({"geo_id": "time"}).reset_coords()
     _ds = ds.copy()
     corr_ds_i = xr.where(
         _ds.latitude <= 0,
-        corr_ds_sel.sel(latitude=-45).interp(
+        corr_ds_sel.sel(latitude=-45, method="nearest").interp(
             {ch4_var: _ds[ch4_var]}, kwargs=dict(fill_value="extrapolate"),
         ),
-        corr_ds_sel.sel(latitude=45).interp(
+        corr_ds_sel.sel(latitude=45, method="nearest").interp(
             {ch4_var: _ds[ch4_var]}, kwargs=dict(fill_value="extrapolate"),
         ),
     )
