@@ -73,7 +73,9 @@ def epp_noy_single(
     _mv8_noy = _mv8_sel[noy_var]
     _mv8_coch4 = _mv8_co * _mv8_ch4
     _mv8_tpot = _mv8_sel.T_pot
-    _bg_noy = _noy_ch4.interp({ch4_var: _mv8_ch4}).reset_coords()["mean"]
+    _bg_noy = _noy_ch4.interp(
+        {ch4_var: _mv8_ch4}, kwargs=dict(fill_value="extrapolate"),
+    ).reset_coords()["mean"]
     _epp_noy0 = _mv8_noy - _bg_noy
     if tpot_limits is None:
         _potn = trans_tpot(_mv8_sel, arange=(22, 44))
@@ -242,7 +244,7 @@ def process_day_multi1(
     corr_ds_i = corr_ds_sel.groupby(dim).map(
         lambda _ds: _ds.interp({
             ch4_var: ds[ch4_var].sel({dim: _ds[dim]})
-        }).reset_coords()
+        }, kwargs=dict(fill_value="extrapolate")).reset_coords()
     )
     epp_noy_da = epp_noy_multi(ds, corr_ds_i, ch4_var, co_var, noy_var, **kwargs)
     return epp_noy_da
@@ -262,8 +264,12 @@ def process_day_multi2(
     _ds = ds.copy()
     corr_ds_i = xr.where(
         _ds.latitude <= 0,
-        corr_ds_sel.sel(latitude=-45).interp({ch4_var: _ds[ch4_var]}),
-        corr_ds_sel.sel(latitude=45).interp({ch4_var: _ds[ch4_var]}),
+        corr_ds_sel.sel(latitude=-45).interp(
+            {ch4_var: _ds[ch4_var]}, kwargs=dict(fill_value="extrapolate"),
+        ),
+        corr_ds_sel.sel(latitude=45).interp(
+            {ch4_var: _ds[ch4_var]}, kwargs=dict(fill_value="extrapolate"),
+        ),
     )
     epp_noy_da = epp_noy_multi(_ds, corr_ds_i, ch4_var, co_var, noy_var, **kwargs)
     return epp_noy_da
