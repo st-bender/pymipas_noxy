@@ -221,6 +221,10 @@ def main(
     debug("CH4 bins: %s", ch4_bin_edges)
     debug("NOy bins: %s", noy_bin_edges)
 
+    regions = corr_conf.get("region", [])
+    if not hasattr(regions, "__getitem__"):
+        regions = [regions]
+
     # plot config
     plot_conf = config.get("figures", {})
     fig_fmt = plot_conf.get("format", "pdf")
@@ -308,19 +312,23 @@ def main(
             bg_file = config.get(out_target, {}).get("bg_file", None)
             if bg_file is None:
                 info("Calculating (monthly) NOy/CH4 background correlation.")
-                ch4_noy_hist = calc_noy_bg_epp(
-                    combined,
-                    "vmr_ch4", "vmr_co", "vmr_noy",
-                    ch4_bin_edges, noy_bin_edges,
-                    **corr_conf.get("region", {}),
-                    **cthr_conf,
-                    copy_vars=[],
-                )
-                h_ds = ch4_noy_hist.expand_dims(time=[combined.time.mean().values])
-                h_ds = h_ds.expand_dims(
-                    latitude=[np.mean(h_ds.attrs["Latitude range [degrees_north]"])]
-                )
-                hh_ds = h_ds
+                h_dsl = []
+                for reg in regions:
+                    info("region: %s", reg)
+                    ch4_noy_hist = calc_noy_bg_epp(
+                        combined,
+                        "vmr_ch4", "vmr_co", "vmr_noy",
+                        ch4_bin_edges, noy_bin_edges,
+                        **reg,
+                        **cthr_conf,
+                        copy_vars=[],
+                    )
+                    h_ds = ch4_noy_hist.expand_dims(time=[combined.time.mean().values])
+                    h_ds = h_ds.expand_dims(
+                        latitude=[np.mean(h_ds.attrs["Latitude range [degrees_north]"])]
+                    )
+                    h_dsl.append(h_ds)
+                hh_ds = xr.merge(h_dsl)
             else:
                 info("Using NOy/CH4 background correlation from: %s", bg_file)
                 hh_ds = xr.open_dataset(bg_file).load()
@@ -383,7 +391,7 @@ def main(
             if bg_file is None and out_conf.get("netcdf", False):
                 hnc_fname = f"{out_target}_hist_mipasv8_{date}{fig_suff}.nc"
                 hnc_fpname = path.join(out_path, hnc_fname)
-                h_ds.to_netcdf(hnc_fpname, unlimited_dims=["time"])
+                hh_ds.to_netcdf(hnc_fpname, unlimited_dims=["time"])
                 info("Histogram statsitics saved to: %s", hnc_fpname)
 
             ntot_ds = noy_bg_epp.swap_dims({"geo_id": "time"}).resample(time="1d").apply(
