@@ -325,9 +325,6 @@ def main(
                         copy_vars=[],
                     )
                     h_ds = ch4_noy_hist.expand_dims(time=[combined.time.mean().values])
-                    h_ds = h_ds.expand_dims(
-                        latitude=[np.mean(h_ds.attrs["Latitude range [degrees_north]"])]
-                    )
                     h_dsl.append(h_ds)
                 hh_ds = xr.merge(h_dsl)
             else:

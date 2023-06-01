@@ -297,6 +297,7 @@ def calc_noy_bg_epp(
         "AKM diagonal threshold used [1]": akm_thresh or "none",
         "Potential temperature threshold used [K]": tpot_thresh or "none",
     }
+    hist_sds = hist_sds.expand_dims(latitude=[np.nanmean(corr_lats)])
     return hist_sds
 
 
