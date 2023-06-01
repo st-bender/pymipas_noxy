@@ -470,6 +470,16 @@ def calc_Ntot(
     for _v in filter(lambda _v: _v.startswith("vmr_"), nd_ds.data_vars):
         nd_name = "nd_" + _v[4:]
         nd_ds[nd_name] = nd_ds["ndens"] * nd_ds[_v]
+        nd_ds[nd_name].attrs.update({
+            "long_name":
+                nd_ds[_v].attrs["long_name"].replace(
+                    "volume mixing ratio", "number density"
+                ),
+            "standard_name":
+                nd_ds[_v].attrs["standard_name"].replace(
+                    "mole_fraction", "mole_concentration"
+                ),
+        })
     # zonal means
     zm_ds = calc_zms(nd_ds, dlat=dlat, dim=dim)
     # volume element
@@ -481,11 +491,20 @@ def calc_Ntot(
     dvol = 2 * np.pi * (rr**2 * dr).si * dlambda[:, None]
     zm_ds["dvol"] = (
         ("latitude", "altitude"), dvol,
-        {"long_name": "volume element", "units": dvol.unit}
+        {"long_name": "volume element", "standard_name": "air_volume", "units": dvol.unit}
     )
     for _v in filter(lambda _v: _v.startswith("nd_"), zm_ds.data_vars):
         ntot_name = "Ntot_" + _v[3:]
-        zm_ds[ntot_name] = zm_ds[_v] * dvol
-        zm_ds[ntot_name].attrs["long_name"] = "number of molecules"
+        zm_ds[ntot_name] = (zm_ds[_v] * dvol).to_unit("mol")
+        zm_ds[ntot_name].attrs.update({
+            "long_name":
+                zm_ds[ntot_name].attrs["long_name"].replace(
+                    "number density", "moles"
+                ),
+            "standard_name":
+                zm_ds[ntot_name].attrs["standard_name"].replace(
+                    "mole_concentration", "atmosphere_moles"
+                ),
+        })
         # zm_ds[ntot_name].attrs["units"] = zm_ds[_v].units * dvol.unit
     return zm_ds
