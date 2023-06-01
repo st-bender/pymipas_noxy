@@ -325,11 +325,6 @@ def main(
                 info("Using NOy/CH4 background correlation from: %s", bg_file)
                 hh_ds = xr.open_dataset(bg_file).load()
 
-            #noy_bg_epp = sub_bg_noy(
-            #    combined, ch4_noy_hist,
-            #    "vmr_ch4", "vmr_co", "vmr_noy",
-            #    co_thresh=corr_co_thresh,
-            #)
             # Subtract the background NOy
             noy_bg_epp_da = combined.groupby("time.date").apply(
                 process_day_multi2,
@@ -386,8 +381,6 @@ def main(
                 info("Lat-Alt zonal mean saved to: %s", zm_fpname)
 
             if bg_file is None and out_conf.get("netcdf", False):
-                ## h_ds = hist_stats_ds(ch4_noy_hist, "vmr_ch4", "vmr_noy", min_pts=corr_min_pts, min_tot=40)
-                #h_ds = ch4_noy_hist.expand_dims(time=[combined.time.mean().values])
                 hnc_fname = f"{out_target}_hist_mipasv8_{date}{fig_suff}.nc"
                 hnc_fpname = path.join(out_path, hnc_fname)
                 h_ds.to_netcdf(hnc_fpname, unlimited_dims=["time"])
@@ -399,11 +392,6 @@ def main(
                 dim="time",
             )
             debug("daily NOy content ds: %s", ntot_ds)
-            ## info("daily min NOy/CH4 ratio: %s", ntot_ds.noy_vs_ch4.argmin("altitude"))
-            #epp_noy_tot = np.maximum(0., ntot_ds.Ntot_noy_epp).sel(
-            #    altitude=slice(28, 70),
-            #    latitude=slice(-90, 0),
-            #).sum(("altitude", "latitude"))
             epp_noy_tot = ntot_ds.groupby("time").map(
                 integrate_eppnoy,
                 **config.get(out_target, {}).get("sum", {})
