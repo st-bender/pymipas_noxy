@@ -297,6 +297,7 @@ def integrate_eppnoy(
     co_thresh=0.025,
     method="minimum",  # or "gradient" for the (minimum) gradient
     ntot_var="Ntot_noy_epp",
+    dims=("altitude", "latitude"),
 ):
     """Integrates zonal mean columns for total number of molecules
 
@@ -335,6 +336,6 @@ def integrate_eppnoy(
     else:
         # select by CO threshold
         eppnoy_sel = _ds_reg[ntot_var].where(_ds_reg.vmr_co > co_thresh)
-    ret = np.maximum(0., eppnoy_sel).sum()
+    ret = np.maximum(0., eppnoy_sel).sum(dims)
     logger.debug(ret)
     return ret
