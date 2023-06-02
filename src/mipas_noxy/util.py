@@ -90,13 +90,15 @@ def open_mipas_l2(file, **kwargs):
         mipv8_ds = mipv8_ds.rename({"altgrid": "altitude"})
     if "timegrid" in mipv8_ds.dims:
         mipv8_ds = mipv8_ds.swap_dims({"timegrid": "time"})
+    # harmonize dtypes to avoid big/little endian mixup
+    _dtype = mipv8_ds.target.dtype
     # Fix altitude naming and coordinates
     nc4_ds = _open_nc34(file)
     _alt = xr.DataArray(
-        nc4_ds.variables["altitude"][:],
+        nc4_ds.variables["altitude"][:].astype(_dtype),
         dims=("altitude", "time"),
         coords={
-            "altitude": nc4_ds.variables["altitude"][:, 0],
+            "altitude": nc4_ds.variables["altitude"][:, 0].astype(_dtype),
             "time": mipv8_ds.time
         },
     )
