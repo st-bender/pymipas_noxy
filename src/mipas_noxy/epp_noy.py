@@ -304,8 +304,13 @@ def integrate_eppnoy(
     """
     # all-nan array to return in case there is not enough data
     empty = np.nan * xr.ones_like(
-        ds[ntot_var].isel(altitude=0, latitude=0, drop=True),
+        ds[ntot_var].isel(altitude=[0], latitude=[0], drop=False),
     )
+    empty = empty.assign_coords(
+        altitude=[np.nanmean(arange)],
+        latitude=[np.nanmean(lrange)],
+    )
+
     _ds_reg = ds.sel(altitude=slice(*arange), latitude=slice(*lrange))
     if (np.isnan(_ds_reg[ntot_var])).sum() > 0.5 * _ds_reg[ntot_var].count():
         return empty
@@ -337,5 +342,11 @@ def integrate_eppnoy(
         # select by CO threshold
         eppnoy_sel = _ds_reg[ntot_var].where(_ds_reg.vmr_co > co_thresh)
     ret = np.maximum(0., eppnoy_sel).sum(dims)
+    ret = ret.expand_dims(
+        altitude=[np.nanmean(arange)],
+        latitude=[np.nanmean(lrange)],
+    )
+    ret["altitude"].attrs = ds.altitude.attrs
+    ret["latitude"].attrs = ds.latitude.attrs
     logger.debug(ret)
     return ret
