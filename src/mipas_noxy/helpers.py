@@ -404,6 +404,12 @@ def plot_corr_hist(hist_sds, ch4_var, noy_var, cmap="jet", min_pts=0):
     ax.minorticks_on()
     ax.grid(False, which="minor")
     ax.legend();
+    if "latitude" in hist_da.coords:
+        # mean just in case there are more than one
+        if hist_da.latitude.mean() <= 0:
+            ax.set_title("SH")
+        else:
+            ax.set_title("NH")
     return fig
 
 
