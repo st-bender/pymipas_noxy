@@ -360,6 +360,7 @@ def plot_corr_hist(hist_sds, ch4_var, noy_var, cmap="jet", min_pts=0):
         0.,
     )
     hist_da2.attrs = hist_da.attrs
+    hist_da2.attrs["long_name"] = "fraction of data points"
     lmaxmin = np.log(max(hist_da2.min().values, 0.02))
     lmax = np.log(min(hist_da2.max().values, 0.25))
     lx = np.exp(
