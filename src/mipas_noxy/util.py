@@ -244,7 +244,7 @@ def fixup_target_name(ds, from_name, to_name):
         if _ln and from_name in _ln:
             _attrs["long_name"] = _ln.replace(from_name, to_name)
         if _sn and _sn.startswith("mole_fraction"):
-            _attrs["standard_name"] = STD_NAMES[to_name.upper()]
+            _attrs["standard_name"] = STD_NAMES.get(to_name.upper(), _sn)
     # replace in global attributes
     for _k, _v in ds.attrs.items():
         if from_name in _v:
