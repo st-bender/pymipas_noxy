@@ -118,7 +118,7 @@ def histogram2d(ds, x, y, x_edges, y_edges, density=False):
 def histogram2d_kde(
     ds, x, y, x_edges, y_edges,
     dims=("altitude", "geo_id",),
-    **kwargs,
+    **kwargs
 ):
     """2-D Histogram using Gaussian kernel density estimate
 
