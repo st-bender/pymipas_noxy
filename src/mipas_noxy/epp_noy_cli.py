@@ -430,25 +430,26 @@ def main(
                 hh_ds.to_netcdf(hnc_fpname, unlimited_dims=["time"])
                 info("Histogram statsitics saved to: %s", hnc_fpname)
 
-            ntot_ds = noy_bg_epp.swap_dims({"geo_id": "time"}).resample(time="1d").apply(
-                calc_Ntot,
-                dlat=zm_dlat,
-                dim="time",
-            )
-            debug("daily NOy content ds: %s", ntot_ds)
-            epp_noy_tot = ntot_ds.groupby("time").map(
-                integrate_eppnoy,
-                **config.get(out_target, {}).get("sum", {})
-            ).T
-            epp_noy_tot = epp_noy_tot.to_unit("Gmol")
-            info("Daily hemispheric EPP-NOy: %s", epp_noy_tot)
-            tnc_fname = f"{out_target}_Ntot_mipasv8_{date}{fig_suff}.nc"
-            tnc_fpname = path.join(out_path, tnc_fname)
-            epp_noy_tot.time.encoding["units"] = "days since 2000-01-01"
-            epp_noy_tot.to_dataset().transpose("time", "altitude", "latitude").to_netcdf(
-                tnc_fpname, unlimited_dims=["time"],
-            )
-            info("Daily hemispheric EPP-NOy saved to: %s", tnc_fpname)
+            if "epp_noy_tot" in out_files:
+                ntot_ds = noy_bg_epp.swap_dims({"geo_id": "time"}).resample(time="1d").apply(
+                    calc_Ntot,
+                    dlat=zm_dlat,
+                    dim="time",
+                )
+                debug("daily NOy content ds: %s", ntot_ds)
+                epp_noy_tot = ntot_ds.groupby("time").map(
+                    integrate_eppnoy,
+                    **config.get(out_target, {}).get("sum", {})
+                ).T
+                epp_noy_tot = epp_noy_tot.to_unit("Gmol")
+                info("Daily hemispheric EPP-NOy: %s", epp_noy_tot)
+                tnc_fname = f"{out_target}_Ntot_mipasv8_{date}{fig_suff}.nc"
+                tnc_fpname = path.join(out_path, tnc_fname)
+                epp_noy_tot.time.encoding["units"] = "days since 2000-01-01"
+                epp_noy_tot.to_dataset().transpose("time", "altitude", "latitude").to_netcdf(
+                    tnc_fpname, unlimited_dims=["time"],
+                )
+                info("Daily hemispheric EPP-NOy saved to: %s", tnc_fpname)
 
     return 0
 
