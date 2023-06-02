@@ -354,17 +354,19 @@ def main(
             # Figures
             # Histogram only if calculated
             if bg_file is None and "hist" in fig_type:
-                hist_fig = plot_corr_hist(
-                    ch4_noy_hist,
-                    "vmr_ch4", "vmr_noy",
-                    cmap=zm_cmap,
-                    min_pts=cthr_conf.get("min_pts", 0),
-                )
-                hist_fig.suptitle("MIPAS v8" + " " + date)
-                hist_fname = f"{out_target}_hist_mipasv8_{date}_{zm_cmap}{fig_suff}.{fig_fmt}"
-                hist_fpname = path.join(fig_path, hist_fname)
-                hist_fig.savefig(hist_fpname)
-                info("Histogram saved to: %s", hist_fpname)
+                ph_ds = hh_ds.isel(time=0).reset_coords()
+                for ir, _ in enumerate(regions):
+                    hist_fig = plot_corr_hist(
+                        ph_ds.isel(latitude=ir),
+                        "vmr_ch4", "vmr_noy",
+                        cmap=zm_cmap,
+                        min_pts=cthr_conf.get("min_pts", 0),
+                    )
+                    hist_fig.suptitle("MIPAS v8" + " " + date)
+                    hist_fname = f"{out_target}_hist_mipasv8_{date}_{zm_cmap}{fig_suff}_reg{ir}.{fig_fmt}"
+                    hist_fpname = path.join(fig_path, hist_fname)
+                    hist_fig.savefig(hist_fpname)
+                    info("Region %d histogram saved to: %s", ir, hist_fpname)
 
             # (Monhtly) zonal mean
             if "zm" in fig_type:
