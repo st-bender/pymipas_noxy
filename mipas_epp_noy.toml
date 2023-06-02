@@ -4,10 +4,11 @@ resolution = "R"
 # resolution = "H"
 
 [output]
-netcdf = false
 # path = "."
 # single target
 targets = ["epp_noy"]
+# data sets to save
+datasets = ["combined", "hist"]
 
 [input]
 path = "./MIPAS_NOY/"

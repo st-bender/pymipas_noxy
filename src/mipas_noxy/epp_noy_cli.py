@@ -209,6 +209,7 @@ def main(
     out_targets = out_conf.get("targets", [])
     if not hasattr(out_targets, "__getitem__"):
         out_targets = [out_targets]
+    out_files = out_conf.get("datasets", [])
 
     debug("input config: %s", inp_conf)
     debug("output config: %s", out_conf)
@@ -303,7 +304,7 @@ def main(
                 ["weights", "retrieval_in_logarithmic_parameter_space"],
             )
             debug("combined: %s", combined)
-            if out_conf.get("netcdf", False):
+            if "combined" in out_files:
                 cnc_fname = f"{out_target}_combined_mipasv8_{date}.nc"
                 cnc_fpname = path.join(out_path, cnc_fname)
                 combined.time.encoding["units"] = "days since 2000-01-01"
@@ -388,7 +389,7 @@ def main(
                 fig.savefig(zm_fpname)
                 info("Lat-Alt zonal mean saved to: %s", zm_fpname)
 
-            if bg_file is None and out_conf.get("netcdf", False):
+            if bg_file is None and "hist" in out_files:
                 hnc_fname = f"{out_target}_hist_mipasv8_{date}{fig_suff}.nc"
                 hnc_fpname = path.join(out_path, hnc_fname)
                 hh_ds.time.encoding["units"] = "days since 2000-01-01"
