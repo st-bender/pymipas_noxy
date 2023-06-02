@@ -33,7 +33,13 @@ import toml
 # %%
 from .epp_noy import integrate_eppnoy, process_day_multi2
 from .units import convert_to_ppm
-from .util import read_mv8_species_v1, compat_drop_vars
+from .util import (
+    read_mv8_species_v1,
+    compat_drop_vars,
+    fixup_altitudes,
+    fixup_target_name,
+    get_nc_filename,
+)
 from .helpers import (
     calc_Ntot,
     calc_noy_bg_epp,
@@ -342,6 +348,34 @@ def main(
                 noy_bg_epp_da = noy_bg_epp_da.drop("vmr_ch4")
             if "latitude" in noy_bg_epp_da.coords:
                 noy_bg_epp_da = noy_bg_epp_da.drop("latitude")
+
+            if "epp_noy" in out_files:
+                mv8_noy1 = mv8_noy_id.copy()
+                mv8_noy1["target"] = noy_bg_epp_da
+                mv8_noy1 = mv8_noy1.swap_dims({"geo_id": "time"}).reset_coords()
+                # Fixup to make the dataset compliant with
+                # the original v8 netcdf data sets.
+                oname = "".join(_c for _c in out_target if _c not in "_-")
+                mv8_noy1 = fixup_target_name(
+                    mv8_noy1,
+                    inp_conf[out_target]["targets"][0],
+                    oname.upper(),
+                )
+                mv8_noy1 = fixup_altitudes(mv8_noy1)
+                debug("MIPAS v8 EPP-NOy ds fixed: %s", mv8_noy1)
+
+                # Construct file/path name for output species
+                out_path1 = get_nc_filename(
+                    out_conf.get("path", "."),
+                    config.get("resolution", "R"),
+                    oname.upper(),  # upper case in filename
+                    year,
+                    month,
+                    version=inp_conf.get(out_target, {}).get("versions", [])[0],
+                )
+                mv8_noy1.to_netcdf(out_path1)
+                info("EPP-NOy data set saved to: %s", out_path1)
+
             # Combine with the original
             noy_bg_epp = xr.merge([
                 combined,
