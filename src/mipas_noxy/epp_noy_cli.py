@@ -260,6 +260,11 @@ def main(
             mv8_noy = mv8_noy.isel(species=0)
             mv8_ch4 = mv8_ch4.isel(species=0)
             mv8_co = mv8_co.isel(species=0)
+            # drop unneeded variables
+            mv8_noy = compat_drop_vars(
+                mv8_noy,
+                ["weights", "retrieval_in_logarithmic_parameter_space"],
+            )
             mv8_noy_id, mv8_ch4_id, mv8_co_id = select_common_data(mv8_noy, mv8_ch4, mv8_co)
 
             smooth_ch4 = smooth_targets(mv8_noy_id, mv8_ch4_id)
@@ -297,11 +302,6 @@ def main(
             combined["T_pot"] = potential_temperature(
                 combined.pressure,
                 combined.temperature,
-            )
-            # drop unneeded variables
-            combined = compat_drop_vars(
-                combined,
-                ["weights", "retrieval_in_logarithmic_parameter_space"],
             )
             debug("combined: %s", combined)
             if "combined" in out_files:
