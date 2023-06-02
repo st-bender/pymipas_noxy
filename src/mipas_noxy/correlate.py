@@ -161,7 +161,7 @@ def histogram2d_kde(
 
     gkde = gaussian_kde(
         ds[[x, y]].stack(_id=dims).dropna("_id").to_array(),
-        **kwargs,
+        **kwargs
     )
     info("kde bandwidth factor: %f", gkde.factor)
     kde_eval = gkde(poss)
