@@ -164,7 +164,7 @@ def main(
                 ["weights", "retrieval_in_logarithmic_parameter_space"]
             )
 
-            # Fixup to make the dataset comliant with
+            # Fixup to make the dataset compliant with
             # the original v8 netcdf data sets.
             mv8_noy1 = fixup_target_name(
                 mv8_noy1,
