@@ -192,11 +192,6 @@ def plot_day_zms(
 
 # %%
 def hist_stats_ds(hist_da, ch4_var, noy_var, min_pts=0, min_tot=0):
-    def _interp_ch4_bins(_da):
-        return _da.dropna(ch4_binv).interp(
-            {ch4_binv: hist_da[ch4_binv]},
-            kwargs=dict(fill_value="extrapolate"),
-        )
     ch4_binv = ch4_var + "_bins"
     noy_binv = noy_var + "_bins"
     _hist_da = xr.where(hist_da >= min_pts, hist_da, 0.)
@@ -206,10 +201,6 @@ def hist_stats_ds(hist_da, ch4_var, noy_var, min_pts=0, min_tot=0):
     _hist_var = hist_var(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
     _hist_sum = _hist_da.sum(noy_binv)
     _hist_sum.attrs = {"long_name": "number of data points", "units": "1"}
-    # interpolate to "original" CH4 bins
-    _hist_mean = _interp_ch4_bins(_hist_mean)
-    _hist_median = _interp_ch4_bins(_hist_median).drop(noy_binv)
-    _hist_mode = _interp_ch4_bins(_hist_mode).drop(noy_binv)
     _hist_var = np.interp(
         hist_da[ch4_binv],
         _hist_var.dropna(ch4_binv)[ch4_binv],

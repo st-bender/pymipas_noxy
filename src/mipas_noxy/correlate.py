@@ -201,6 +201,11 @@ def xy_interpolate_to_zero(ds, bin_var, **kwargs):
         _ds = xr.concat([_zero_pt, _ds], dim=bin_var)
     # interpolate (over nans)
     ret = _ds.interpolate_na(dim=bin_var, **kwargs)
+    # interpolate to "original" bins
+    ret = ret.dropna(bin_var).interp(
+        {bin_var: ds[bin_var]},
+        kwargs=dict(fill_value="extrapolate"),
+    )
     return ret
 
 
