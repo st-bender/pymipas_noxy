@@ -295,6 +295,7 @@ def integrate_eppnoy(
     asearch_max=44,
     lsearch_num=3,
     co_thresh=None,
+    co_var="vmr_co",
     method="minimum",  # or "gradient" for the (minimum) gradient
     ntot_var="Ntot_noy_epp",
     dims=("altitude", "latitude"),
@@ -340,7 +341,7 @@ def integrate_eppnoy(
         eppnoy_sel = _ds_reg[ntot_var].sel(altitude=slice(_min_alt, 70))
     else:
         # select by CO threshold
-        eppnoy_sel = _ds_reg[ntot_var].where(_ds_reg.vmr_co > co_thresh)
+        eppnoy_sel = _ds_reg[ntot_var].where(_ds_reg[co_var].to_unit("ppm") > co_thresh)
     ret = np.maximum(0., eppnoy_sel).sum(dims)
     ret = ret.expand_dims(
         altitude=[np.nanmean(arange)],
