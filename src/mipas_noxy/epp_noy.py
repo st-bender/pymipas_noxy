@@ -294,7 +294,7 @@ def integrate_eppnoy(
     arange=(25, 70), lrange=(-90, 0),  # for integration
     asearch_max=44,
     lsearch_num=3,
-    co_thresh=0.025,
+    co_thresh=None,
     method="minimum",  # or "gradient" for the (minimum) gradient
     ntot_var="Ntot_noy_epp",
     dims=("altitude", "latitude"),
