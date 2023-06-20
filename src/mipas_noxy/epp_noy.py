@@ -341,7 +341,7 @@ def integrate_eppnoy(
             # couldn't find the index for the minimum
             return empty
         _min_alt = _ds_reg.altitude.isel(altitude=_min_ai).values
-        logger.debug(_min_alt)
+        logger.info("integrating from %g km to top", _min_alt)
         eppnoy_sel = _ds_reg[ntot_var].sel(altitude=slice(_min_alt, 70))
     else:
         # select by CO threshold
