@@ -264,10 +264,10 @@ def process_day_multi2(
     _ds = ds.copy()
     corr_ds_i = xr.where(
         _ds.latitude <= 0,
-        corr_ds_sel.sel(latitude=-45, method="nearest").interp(
+        corr_ds_sel.sel(latitude=-45, method="nearest").drop("latitude").interp(
             {ch4_var: _ds[ch4_var]}, kwargs=dict(fill_value="extrapolate"),
         ),
-        corr_ds_sel.sel(latitude=45, method="nearest").interp(
+        corr_ds_sel.sel(latitude=45, method="nearest").drop("latitude").interp(
             {ch4_var: _ds[ch4_var]}, kwargs=dict(fill_value="extrapolate"),
         ),
     )
