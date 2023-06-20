@@ -315,12 +315,16 @@ def integrate_eppnoy(
     _ds_reg = ds.sel(altitude=slice(*arange), latitude=slice(*lrange))
     if (np.isnan(_ds_reg[ntot_var])).sum() > 0.5 * _ds_reg[ntot_var].count():
         return empty
+    if np.mean(lrange) <= 0:
+        lslice = slice(0, lsearch_num)
+    else:
+        lslice = slice(-lsearch_num, -1)
     if co_thresh is None:
         # select by noy/ch4 minimum altitude
         amin = arange[0]
         amax = asearch_max
         _noy_ch4_sel = _ds_reg.noy_vs_ch4.isel(
-            latitude=slice(0, lsearch_num), drop=True,
+            latitude=lslice, drop=True,
         ).sel(altitude=slice(amin, amax))
         # fill negative values with the median for finding the minimum
         _noy_ch4_sel = xr.where(_noy_ch4_sel > 0, _noy_ch4_sel, _noy_ch4_sel.median())
