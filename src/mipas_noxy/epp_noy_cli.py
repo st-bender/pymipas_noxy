@@ -445,8 +445,10 @@ def main(
                 info("Daily hemispheric EPP-NOy: %s", epp_noy_tot)
                 tnc_fname = f"{out_target}_Ntot_mipasv8_{date}{fig_suff}.nc"
                 tnc_fpname = path.join(out_path, tnc_fname)
-                epp_noy_tot.time.encoding["units"] = "days since 2000-01-01"
-                epp_noy_tot.to_dataset().transpose("time", "altitude", "latitude").to_netcdf(
+                # convert to dataset for netcdf
+                epp_noy_tot_ds = epp_noy_tot.to_dataset()
+                epp_noy_tot_ds.time.encoding["units"] = "days since 2000-01-01"
+                epp_noy_tot_ds.transpose("time", "altitude", "latitude").to_netcdf(
                     tnc_fpname, unlimited_dims=["time"],
                 )
                 info("Daily hemispheric EPP-NOy saved to: %s", tnc_fpname)
