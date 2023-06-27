@@ -213,7 +213,7 @@ def main(
     out_conf = config.get("output", {})
     out_path = out_conf.get("path", ".")
     out_targets = out_conf.get("targets", [])
-    if not hasattr(out_targets, "__getitem__"):
+    if not hasattr(out_targets, "__getitem__") or isinstance(out_targets, str):
         out_targets = [out_targets]
     out_files = out_conf.get("datasets", [])
 
@@ -229,7 +229,7 @@ def main(
     debug("NOy bins: %s", noy_bin_edges)
 
     regions = corr_conf.get("region", [])
-    if not hasattr(regions, "__getitem__"):
+    if not hasattr(regions, "__getitem__") or isinstance(regions, str):
         regions = [regions]
 
     # plot config
