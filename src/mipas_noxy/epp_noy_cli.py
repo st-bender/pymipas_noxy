@@ -448,6 +448,7 @@ def main(
                 # convert to dataset for netcdf
                 epp_noy_tot_ds = epp_noy_tot.to_dataset()
                 epp_noy_tot_ds.time.encoding["units"] = "days since 2000-01-01"
+                epp_noy_tot_ds.attrs["config"] = str(config)
                 epp_noy_tot_ds.transpose("time", "altitude", "latitude").to_netcdf(
                     tnc_fpname, unlimited_dims=["time"],
                 )
