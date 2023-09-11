@@ -255,6 +255,7 @@ def main(
         date = f"{year:04d}{month:02d}"
         for out_target in out_targets:
             info("Processing: %s %s %s", out_target, year, month)
+            out_target_conf = config.get(out_target, {})
 
             # read species netcdfs into list
             mv8_noy_l = read_mv8_species_v1(config, out_target, year, month)
@@ -317,7 +318,7 @@ def main(
                 combined.to_netcdf(cnc_fpname) #, unlimited_dims=["geo_id"])
                 info("Combined data set saved to: %s", cnc_fpname)
 
-            bg_file = config.get(out_target, {}).get("bg_file", None)
+            bg_file = out_target_conf.get("bg_file", None)
             if bg_file is None:
                 info("Calculating (monthly) NOy/CH4 background correlation.")
                 h_dsl = []
@@ -342,7 +343,7 @@ def main(
             noy_bg_epp_da = combined.groupby("time.date").apply(
                 process_day_multi2,
                 args=(hh_ds, "vmr_ch4", "vmr_co", "vmr_noy",),
-                **config.get(out_target, {}).get("sub", {}),
+                **out_target_conf.get("sub", {}),
             )
             if "vmr_ch4" in noy_bg_epp_da.coords:
                 noy_bg_epp_da = noy_bg_epp_da.drop("vmr_ch4")
@@ -355,7 +356,11 @@ def main(
                 mv8_noy1 = mv8_noy1.swap_dims({"geo_id": "time"}).reset_coords()
                 # Fixup to make the dataset compliant with
                 # the original v8 netcdf data sets.
-                oname = "".join(_c for _c in out_target if _c not in "_-")
+                # Use the "name" if set.
+                oname = out_target_conf.get(
+                    "name",
+                    "".join(_c for _c in out_target if _c not in "_-")
+                )
                 mv8_noy1 = fixup_target_name(
                     mv8_noy1,
                     inp_conf[out_target]["targets"][0],
@@ -439,7 +444,7 @@ def main(
                 debug("daily NOy content ds: %s", ntot_ds)
                 epp_noy_tot = ntot_ds.groupby("time").map(
                     integrate_eppnoy,
-                    **config.get(out_target, {}).get("sum", {})
+                    **out_target_conf.get("sum", {}),
                 ).T
                 epp_noy_tot = epp_noy_tot.to_unit("Gmol")
                 info("Daily hemispheric EPP-NOy: %s", epp_noy_tot)
