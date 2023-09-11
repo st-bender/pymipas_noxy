@@ -314,7 +314,7 @@ def sub_bg_noy(
     # "background" NOy = all NOy where CO <= threshold,
     # in those places there should be no EPP effect.
     noy_bg = xr.where(
-        (ds[co_var] <= co_thresh),
+        (ds[co_var].to_unit("ppm") <= co_thresh),
         ds[noy_var],
         _noy_bg,
     )
