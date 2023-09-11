@@ -472,13 +472,6 @@ def calc_Ntot(
     ndens = ds.pressure / ac.R / ds.temperature
     # convert to number densities
     nd_ds = ds.copy()
-    #nd_ds["ndens"] = (
-    #    ds.pressure.dims, ndens,
-    #    {
-    #        "long_name": "number density of molecules in air",
-    #        # "units": ndens.unit.si,
-    #    }
-    #)
     nd_ds["ndens"] = ndens
     nd_ds["ndens"].attrs.update({"long_name": "number density of molecules in air"})
     for _v in filter(lambda _v: _v.startswith("vmr_"), nd_ds.data_vars):
