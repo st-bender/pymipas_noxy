@@ -490,7 +490,7 @@ def calc_Ntot(
     # zonal means
     zm_ds = calc_zms(nd_ds, dlat=dlat, dim=dim)
     # volume element
-    alt_unit = au.Unit(getattr(au, ds.altitude.attrs["units"]))
+    alt_unit = au.Unit(ds.altitude.attrs["units"])
     # dlambda = (np.cos(np.radians(zm_ds.latitude)) * np.radians(dlat)).values
     dlambda = np.diff(np.sin(np.radians(xr.plot.utils._infer_interval_breaks(zm_ds.latitude))))
     dr = np.gradient(zm_ds.altitude) * alt_unit
@@ -513,5 +513,4 @@ def calc_Ntot(
                     "mole_concentration", "atmosphere_moles"
                 ),
         })
-        # zm_ds[ntot_name].attrs["units"] = zm_ds[_v].units * dvol.unit
     return zm_ds
