@@ -122,9 +122,14 @@ def epp_noy_single(
 
 # %%
 def _noy_co_ratio(ds, tpot_thr, eppnoy, co, dim="geo_id"):
-    tpot_x = ds.T_pot.transpose(dim, "altitude")
-    eppnoy_x = eppnoy.transpose(dim, "altitude")
-    co_x = co.transpose(dim, "altitude")
+    tdim = dim
+    if not hasattr(dim, "__getitem__") or isinstance(dim, str):
+        # convert single items or strings to tuple for concatenation
+        tdim = (dim,)
+    dims = tuple(tdim) + ("altitude",)
+    tpot_x = ds.T_pot.transpose(*dims)
+    eppnoy_x = eppnoy.transpose(*dims)
+    co_x = co.transpose(*dims)
     _tp_wh = np.where(tpot_x >= tpot_thr)
     _iix = np.where(np.diff(_tp_wh[0]) > 0)
     _iixp = np.concatenate([[0], _iix[0] + 1])
