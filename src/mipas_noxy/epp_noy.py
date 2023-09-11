@@ -265,6 +265,8 @@ def process_day_multi2(
     corr_ds_sel = corr_ds.sel(time=_ti[0], method="nearest")
     if ch4_var + "_bins" in corr_ds_sel.dims:
         corr_ds_sel = corr_ds_sel.rename({ch4_var + "_bins": ch4_var})
+    if "time" in corr_ds_sel.coords:
+        corr_ds_sel = corr_ds_sel.drop("time")
     # _ds = ds.swap_dims({"geo_id": "time"}).reset_coords()
     _ds = ds.copy()
     corr_ds_i = xr.where(
