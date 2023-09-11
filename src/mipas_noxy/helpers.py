@@ -429,11 +429,18 @@ def calc_zms(
     # skip time and string variables for zonal mean averaging.
     # zm_vars = [_v for _v in ds.data_vars if ds[_v].dtype.char not in "MS"]
     zm_vars = list(filter(lambda _v: ds[_v].dtype.char not in "MS", ds.data_vars))
+    ds = ds.set_coords(("latitude",))  # set as coordinate for binning
 
     ds["weights"] = np.cos(ds["latitude"].to_unit(au.radian))
-    zm_ds = ds.groupby_bins("latitude", lat_edges, labels=lat_cntrs).apply(
-        weighted_zm, dim=dim, variable=zm_vars,
-    )
+    weights = (ds[zm_vars] * 0. + 1.) * ds["weights"]
+    weights = weights.fillna(0.)
+    # weighted data sum per bin
+    zm_wdsum = (ds[zm_vars] * weights).groupby_bins(
+        "latitude", lat_edges, labels=lat_cntrs
+    ).sum(dim=dim)
+    # weight sum per bin
+    zm_wsum = (weights).groupby_bins("latitude", lat_edges, labels=lat_cntrs).sum(dim=dim)
+    zm_ds = zm_wdsum / zm_wsum
     zm_ds = zm_ds.rename({"latitude": "lat_orig", "latitude_bins": "latitude"})
     zm_ds.latitude.attrs = zm_ds.lat_orig.attrs
 
