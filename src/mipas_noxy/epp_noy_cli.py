@@ -367,6 +367,7 @@ def main(
                     oname.upper(),
                 )
                 mv8_noy1 = fixup_altitudes(mv8_noy1)
+                mv8_noy1.attrs.update(out_target_conf.get("attrs", {}))
                 debug("MIPAS v8 EPP-NOy ds fixed: %s", mv8_noy1)
 
                 # Construct file/path name for output species
