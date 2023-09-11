@@ -323,13 +323,13 @@ def sub_bg_noy(
     epp_name = noy_var + "_epp"
     ret = ds.copy()
     ret[bg_name] = noy_bg
-    ret[bg_name].attrs = {
-        "long_name": "volume mixing ratio of background NOy", "units": "ppm",
-    }
+    ret[bg_name].attrs.update({
+        "long_name": "volume mixing ratio of background NOy",
+    })
     ret[epp_name] = ret[noy_var] - ret[bg_name]
-    ret[epp_name].attrs = {
-        "long_name": "volume mixing ratio of EPP NOy", "units": "ppm",
-    }
+    ret[epp_name].attrs.update({
+        "long_name": "volume mixing ratio of EPP NOy",
+    })
     ret.attrs.update(h_sds.attrs)
     return ret
 
