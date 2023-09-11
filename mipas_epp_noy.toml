@@ -80,6 +80,29 @@ asearch_max = 44  # between arange[0] and asearch_max
 lsearch_num = 3  # and averages lsearch_num latitude bins
 method = "minimum"  # or "gradient" for the (minimum) gradient
 
+# global attributes
+[epp_noy.attrs]
+## author metadata
+address = "Institude Street no. 1, 10000 City, Country"
+author = "First Last"
+email = "first.last@institute.edu"
+institute = "Institute Name"
+organization = "University of City"
+## dataset metadata
+# data_version = "V8R_EPPNOY_261"
+experiment = "MIPAS"
+name_of_platform = "ENVISAT"
+platform = "SATELLITE"
+title = "MIPAS EPP-NOy data, processed at Institute, City, Country"
+# restrict_altitude_range = "use visibility == 1 and akm_diagonal > 0.03 to find valid data"
+# retrieval_target_name = "EPPNOY"
+retrieval_in_logarithmic_parameter_space = "TRUE"
+use_data_only_in_altitude_range = "20-120 km"
+## file format metadata
+# data_format_version = "data format version 0.2.0"
+# conventions = "CF-1.6"
+# file_version = "FV-2.0"
+
 [figures]
 cmap = "cividis"
 path = "./fig_cividis"
