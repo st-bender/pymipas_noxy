@@ -242,6 +242,7 @@ def calc_noy_bg_epp(
     co_thresh=None,
     tpot_thresh=None,
     min_pts=0,
+    min_tot=40,
     copy_vars=["latitude", "lat_bnds", "longitude", "lon_bnds", "time_bnds"],
 ):
     corr_alts = alt_range
@@ -278,8 +279,9 @@ def calc_noy_bg_epp(
     # hist_da = histogram2d_kde(_ds, ch4_var, noy_var, ch4_bin_edges, noy_bin_edges, dims=("altitude", "geo_id"))
     _hist_da = xr.where(hist_da >= min_pts, hist_da, 0.)
 
+    logger.info("min %d histogram points", min_tot)
     ## %%
-    hist_sds = hist_stats_ds(_hist_da, ch4_var, noy_var, min_pts=0, min_tot=40)
+    hist_sds = hist_stats_ds(_hist_da, ch4_var, noy_var, min_pts=0, min_tot=min_tot)
     hist_sds.attrs = {
         "Altitude range [km]": corr_alts,
         "Latitude range [degrees_north]": corr_lats,
