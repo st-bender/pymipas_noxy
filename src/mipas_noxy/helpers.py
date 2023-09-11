@@ -441,8 +441,14 @@ def calc_zms(
     # weight sum per bin
     zm_wsum = (weights).groupby_bins("latitude", lat_edges, labels=lat_cntrs).sum(dim=dim)
     zm_ds = zm_wdsum / zm_wsum
-    zm_ds = zm_ds.rename({"latitude": "lat_orig", "latitude_bins": "latitude"})
-    zm_ds.latitude.attrs = zm_ds.lat_orig.attrs
+    if "latitude" in zm_ds:
+        # rename old latitudes first
+        zm_ds = zm_ds.rename({"latitude": "lat_orig"})
+    zm_ds = zm_ds.rename({"latitude_bins": "latitude"})
+    zm_ds.latitude.attrs = ds.latitude.attrs
+    if "lat_orig" in zm_ds:
+        # copy attributes from the "original" latitudes
+        zm_ds.latitude.attrs = zm_ds.lat_orig.attrs
 
     if "time" in dim:
         zm_ds["time"] = ds.time.mean("time").dt.round("s")
