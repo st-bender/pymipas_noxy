@@ -306,7 +306,11 @@ def sub_bg_noy(
 
     _noy_bg = _hist_mean.rename(
         {ch4_binv: ch4_var}
-    ).interp({ch4_var: ds[ch4_var]}, kwargs=dict(fill_value="extrapolate"))
+    ).interp(
+        # interpolate from histogram CH4 to values from the dataset
+        {ch4_var: ds[ch4_var]},
+        kwargs=dict(fill_value="extrapolate"),
+    )
     logger.debug(_noy_bg[ch4_var])
     _noy_bg = _noy_bg.drop(ch4_var)
 
