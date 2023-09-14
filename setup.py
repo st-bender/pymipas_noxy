@@ -10,6 +10,7 @@ meta_path = path.join("src", name, "__init__.py")
 here = path.abspath(path.dirname(__file__))
 
 extras_require = {
+    "epp_noy": ["astropy"],
     "tests": ["pytest"],
 }
 extras_require["all"] = sorted(
@@ -86,6 +87,7 @@ if __name__ == "__main__":
         entry_points={
             "console_scripts": [
                 "mipas_noxy = mipas_noxy.__main__:main",
+                "epp_noy = mipas_noxy.epp_noy_cli:main",
             ]
         },
         options={
