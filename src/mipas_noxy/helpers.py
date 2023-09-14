@@ -412,7 +412,10 @@ def plot_corr_hist(hist_sds, ch4_var, noy_var, cmap="jet", min_pts=0):
 
 # %%
 def weighted_zm(ds, dim="time", variable="target", weight_var="weights"):
-    # weights = np.cos(np.radians(ds[weight_var]))
+    # In some cases the weights can have different dimensions than the data
+    # and simply summing the weights does not normalize them correctly.
+    # Broadcasts them to consistent shapes and normalization with `.sum()`.
+    # NaNs in the data should also propagate this way and get zero weights.
     weights = (ds[variable] * 0. + 1.) * ds[weight_var]
     weights = weights.fillna(0.)
     ww = weights / weights.sum(dim)
