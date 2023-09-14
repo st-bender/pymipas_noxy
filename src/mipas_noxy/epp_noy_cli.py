@@ -244,10 +244,7 @@ def main(
     zm_alts = plot_conf.get("plot_alts", (None, None))
     zm_lats = plot_conf.get("plot_lats", (-90, 90))
     zm_cmap = plot_conf.get("cmap", "jet")
-    zm_co_thresh = plot_conf.get(
-        "co_thresh",
-        cthr_conf.get("co_thresh", None),
-    )
+    zm_co_thresh = plot_conf.get("co_thresh", None)
     zm_dlat = plot_conf.get("zm_dlat", 5.0)
     plt.style.use(plot_conf.get("style", None))
 

@@ -111,6 +111,8 @@ plot_alts = [20.0, 80.0]
 plot_lats = [-90.0, 0.0]
 # plot_lats = [0.0, 90.0]
 zm_dlat = 5.0
+## CO threshold to indicate in zonal mean figures, comment to deactivate
+# co_thresh = 0.1
 format = "pdf"
 # suffix = "_co005_ak0000"
 suffix = "auto"
