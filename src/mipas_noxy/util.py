@@ -123,6 +123,55 @@ def open_mipas_l2(file, **kwargs):
     return mipv8_ds
 
 
+def open_mfmipas_l2(files, dim="time", **kwargs):
+    """Opens multiple MIPAS level-2 files
+
+    Automatically combines multiple MIPAS level-2 netcdf data files
+    along the concatenation (time) dimension. Uses `open_mipas_l2`
+    to iterate over the files passed or derived from the glob string.
+    Currently works only for opening files for the *same* trace gas.
+
+    Parameters
+    ----------
+    files: str or sequence of paths
+        The file names to open, either as a glob string or a list
+        of path names.
+    dim: str, optional (default: time)
+        Dimension over which to concatenate the level-2 datasets.
+    **kwargs: dict, optional
+        Keyword arguments passed to `xarray.open_dataset()`
+
+    Returns
+    -------
+    dataset: xarray.Dataset
+        The dataset containing the MIPAS level-2 data.
+    """
+    def _fspath1(f):
+        # mimic `os.fspath()` for Py27 and Py35
+        # no error checking
+        return type(f).__fspath__(f)
+
+    # inspired by `xarray.backends.common._find_absolute_paths()`
+    if isinstance(files, str):
+        from glob import glob
+        files = sorted(glob(files))
+    elif hasattr(files, "__fspath__"):
+        files = [_fspath1(files)]
+    else:
+        files = [_fspath1(f) if hasattr(f, "__fspath__") else f for f in files]
+
+    datasets = [open_mipas_l2(f, **kwargs) for f in files]
+    try:
+        combined = xr.concat(datasets, dim=dim)
+    except (TypeError, ValueError):
+        # close datasets on errors
+        for ds in datasets:
+            ds.close()
+        raise
+
+    return combined
+
+
 def interp_altitude(ds, interp_error=False, **kwargs):
     ret = ds.interp(**kwargs)
     if interp_error:
