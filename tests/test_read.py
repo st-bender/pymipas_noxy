@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
-from os import sep as dsep
+from os import path, sep as dsep
 
 import pytest
 
-from mipas_noxy.util import get_nc_filename
+from mipas_noxy.util import get_nc_filename, open_mipas_l2
 
 
 @pytest.mark.parametrize(
@@ -19,3 +19,11 @@ def test_get_nc_filename(res, spec, v, name):
         "", res, spec, 2000, 1, version=v,
     )
     assert fpath == name
+
+
+def test_read_single():
+    file = path.join(
+        "tests", "data", "V8R_NO2_261_0", "MIPAS-E_IMK.201004.V8R_NO2_261_0.nc",
+    )
+    ds = open_mipas_l2(file)
+    assert ds
