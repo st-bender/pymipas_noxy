@@ -55,6 +55,18 @@ def open_mipas_l2(file, **kwargs):
     Opens the MIPAS level-2 netcdf file and harmonizes the
     altitude coordinates so that the dataset can be easily
     processed with `xarray`.
+
+    Parameters
+    ----------
+    file: str
+        The name of the file to open.
+    **kwargs: dict, optional
+        Keyword arguments passed to `xarray.open_dataset()`
+
+    Returns
+    -------
+    dataset: xarray.Dataset
+        The dataset containing the MIPAS level-2 data.
     """
     def _open_nc34(file):
         try:
