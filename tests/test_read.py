@@ -4,7 +4,7 @@ from os import path, sep as dsep
 
 import pytest
 
-from mipas_noxy.util import get_nc_filename, open_mipas_l2
+from mipas_noxy.util import get_nc_filename, open_mipas_l2, open_mfmipas_l2
 
 
 @pytest.mark.parametrize(
@@ -26,4 +26,25 @@ def test_read_single():
         "tests", "data", "V8R_NO2_261_0", "MIPAS-E_IMK.201004.V8R_NO2_261_0.nc",
     )
     ds = open_mipas_l2(file)
+    assert ds
+
+
+@pytest.mark.parametrize(
+    "files",
+    [
+        # glob version
+        path.join(
+            "tests", "data", "V8R_NO_261_0", "MIPAS-E_IMK.*.V8R_NO_261_0.nc",
+        ),
+        # list of paths
+        [
+            path.join(
+                "tests", "data", "V8R_NO_261_0",
+                "MIPAS-E_IMK.201004.V8R_NO_261_0.nc",
+            )
+        ],
+    ]
+)
+def test_read_multi(files):
+    ds = open_mfmipas_l2(files)
     assert ds
