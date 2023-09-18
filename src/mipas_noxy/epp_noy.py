@@ -40,7 +40,7 @@ logger = logging.getLogger()
 
 
 # %%
-def trans_tpot(ds, arange=(22, 44)):
+def tpot_at_noych4_min(ds, arange=(22, 44)):
     """Find potential temperature at NOy/CH4 minimum in range
     """
     _ds_sel = ds.sel(altitude=slice(*arange))
@@ -78,7 +78,7 @@ def epp_noy_single(
     ).reset_coords()["mean"]
     _epp_noy0 = _mv8_noy - _bg_noy
     if tpot_limits is None:
-        _potn = trans_tpot(_mv8_sel, arange=(22, 44))
+        _potn = tpot_at_noych4_min(_mv8_sel, arange=(22, 44))
         _pots = _potn
     else:
         _mv8_mnth = _mv8_sel.time.dt.month.values
@@ -167,7 +167,7 @@ def epp_noy_multi(
     _epp_noy0 = _mv8_noy - _bg_noy
 
     if tpot_limits is None:
-        _potn = trans_tpot(_mv8_sel, arange=(22, 44))
+        _potn = tpot_at_noych4_min(_mv8_sel, arange=(22, 44))
         _pots = _potn
     else:
         _mv8_mnth = _mv8_sel.time.dt.month.values[0]
