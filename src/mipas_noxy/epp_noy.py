@@ -145,7 +145,7 @@ def _noy_co_ratio(ds, tpot_thr, eppnoy, co, dim="geo_id"):
 
 # %%
 def epp_noy_multi(
-    _mv8_sel, corr_ds,
+    ds, corr_ds,
     ch4_var, co_var, noy_var,
     co_high=0.7,
     co_low=0.07,
@@ -157,24 +157,24 @@ def epp_noy_multi(
 ):
     """Background and EPP NOy calculation for multiple profiles
     """
-    _lat = _mv8_sel.latitude
-    _mv8_ch4 = _mv8_sel[ch4_var]
-    _mv8_co = _mv8_sel[co_var]
-    _mv8_noy = _mv8_sel[noy_var]
+    _lat = ds.latitude
+    _mv8_ch4 = ds[ch4_var]
+    _mv8_co = ds[co_var]
+    _mv8_noy = ds[noy_var]
     _mv8_coch4 = _mv8_co * _mv8_ch4
-    _mv8_tpot = _mv8_sel.T_pot
+    _mv8_tpot = ds.T_pot
     _bg_noy = corr_ds["mean"]
     _epp_noy0 = _mv8_noy - _bg_noy
 
     if tpot_limits is None:
-        _potn = tpot_at_noych4_min(_mv8_sel, arange=(22, 44))
+        _potn = tpot_at_noych4_min(ds, arange=(22, 44))
         _pots = _potn
     else:
-        _mv8_mnth = _mv8_sel.time.dt.month.values[0]
+        _mv8_mnth = ds.time.dt.month.values[0]
         _potn = tpot_limits[(_mv8_mnth + 6 - 1) % 12]
         _pots = tpot_limits[_mv8_mnth - 1]
-    _ratio_n = _noy_co_ratio(_mv8_sel, _potn, _epp_noy0, _mv8_co, dim=dim)
-    _ratio_s = _noy_co_ratio(_mv8_sel, _pots, _epp_noy0, _mv8_co, dim=dim)
+    _ratio_n = _noy_co_ratio(ds, _potn, _epp_noy0, _mv8_co, dim=dim)
+    _ratio_s = _noy_co_ratio(ds, _pots, _epp_noy0, _mv8_co, dim=dim)
 
     _epp_noy = xr.zeros_like(_mv8_noy)
     # large CO vmr ~ all NOy is from EPP
@@ -201,7 +201,7 @@ def epp_noy_multi(
         ),
         0.
     )
-    _epp_noy = xr.where(_mv8_sel.altitude > 20., _epp_noy, 0.)
+    _epp_noy = xr.where(ds.altitude > 20., _epp_noy, 0.)
     _epp_noy.attrs.update({
         "long_name": "volume mixing ratio of EPP NOy",
     })
