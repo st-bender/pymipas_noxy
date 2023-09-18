@@ -60,7 +60,6 @@ def epp_noy_single(
     ch4_fac=0.026,
     ch4_const=0.012,
     dim="geo_id",
-    ivar="vmr_ch4",
     tpot_limits=None,
 ):
     """Background and EPP NOy calculation for a single profile
