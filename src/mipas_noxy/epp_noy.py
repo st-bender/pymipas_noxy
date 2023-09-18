@@ -63,6 +63,58 @@ def epp_noy_single(
     tpot_limits=None,
 ):
     """Background and EPP NOy calculation for a single profile
+
+    Separates the background and EPP-NOy contents based on the
+    correlations with CH4 and on thresholds based on the CO.
+    This function operates on a single profile, useful with
+    `<ds>.groupby(dim).map(...)`.
+
+    Parameters
+    ----------
+    ds: `xarray.Dataset`
+        Combined dataset containing the trace gas data,
+        including the vmrs of CO, CH4, and NOy.
+    corr_ds: `xarray.Dataset`
+        Dataset containing the NOy/CH4 correlation values.
+    ch4_var: str
+        Name of the dataset variable containing the CH4 vmr.
+    co_var: str
+        Name of the dataset variable containing the CO vmr.
+    noy_var: str
+        Name of the dataset variable containing the NOy vmr.
+    co_high: float, optional (default: 0.7)
+        Threshold of CO vmr (in ppm) above which all NOy in
+        the volume is considered EPP-NOy.
+    co_low: float, optional (default: 0.07)
+        Threshold of CO vmr (in ppm) below which all NOy in
+        the volume is considered background NOy.
+    co_ch4_min: float, optional (default: 0.0175)
+        Threshold for the product of CO and CH4 vmr below which
+        all NOy in the volume is considered background NOy.
+    ch4_const: float, optional (default: 0.012)
+        Intercept (a) of the linear CH4 threshold to consider all
+        NOy in the volume as EPP-NOy, i.e. if NOy > a + b * CH4,
+        see also `ch4_fac`.
+    ch4_fac: float, optional (default: 0.026)
+        Slope (b) of the linear CH4 threshold to consider all NOy
+        in the volume as EPP-NOy, i.e. if NOy > a + b * CH4,
+        see also `ch4_const`.
+    dim: str, optional (default: "geo_id")
+        The dimension along which the profiles are "stacked".
+        Only used to select the same correlation point.
+    tpot_limits: list of float, optional (default: None)
+        List of monthly potential temperature limits in the SH
+        to separate EPP-NOy from background NOy. For the NH,
+        the list is rotated by 6 months.
+
+    Returns
+    -------
+    epp_noy: `xarray.DataArray`
+        The EPP-NOy content (vmr).
+
+    See Also
+    --------
+    epp_noy_multi, process_day_single
     """
     _lat = ds.latitude
     _id = ds[dim].values
@@ -155,6 +207,57 @@ def epp_noy_multi(
     tpot_limits=None,
 ):
     """Background and EPP NOy calculation for multiple profiles
+
+    Separates the background and EPP-NOy contents based on the
+    correlations with CH4 and on thresholds based on the CO.
+    This function operates on multiple profiles at once.
+
+    Parameters
+    ----------
+    ds: `xarray.Dataset`
+        Combined dataset containing the trace gas data,
+        including the vmrs of CO, CH4, and NOy.
+    corr_ds: `xarray.Dataset`
+        Dataset containing the NOy/CH4 correlation values.
+    ch4_var: str
+        Name of the dataset variable containing the CH4 vmr.
+    co_var: str
+        Name of the dataset variable containing the CO vmr.
+    noy_var: str
+        Name of the dataset variable containing the NOy vmr.
+    co_high: float, optional (default: 0.7)
+        Threshold of CO vmr (in ppm) above which all NOy in
+        the volume is considered EPP-NOy.
+    co_low: float, optional (default: 0.07)
+        Threshold of CO vmr (in ppm) below which all NOy in
+        the volume is considered background NOy.
+    co_ch4_min: float, optional (default: 0.0175)
+        Threshold for the product of CO and CH4 vmr below which
+        all NOy in the volume is considered background NOy.
+    ch4_const: float, optional (default: 0.012)
+        Intercept (a) of the linear CH4 threshold to consider all
+        NOy in the volume as EPP-NOy, i.e. if NOy > a + b * CH4,
+        see also `ch4_fac`.
+    ch4_fac: float, optional (default: 0.026)
+        Slope (b) of the linear CH4 threshold to consider all NOy
+        in the volume as EPP-NOy, i.e. if NOy > a + b * CH4,
+        see also `ch4_const`.
+    dim: str, optional (default: "geo_id")
+        The dimension along which the profiles are "stacked".
+        Only used to select the same correlation point.
+    tpot_limits: list of float, optional (default: None)
+        List of monthly potential temperature limits in the SH
+        to separate EPP-NOy from background NOy. For the NH,
+        the list is rotated by 6 months.
+
+    Returns
+    -------
+    epp_noy: `xarray.DataArray`
+        The EPP-NOy content (vmr).
+
+    See Also
+    --------
+    epp_noy_single, process_day_multi1, process_day_multi2
     """
     _lat = ds.latitude
     _mv8_ch4 = ds[ch4_var]
