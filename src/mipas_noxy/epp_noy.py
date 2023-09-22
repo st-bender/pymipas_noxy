@@ -293,7 +293,7 @@ def epp_noy_multi(
     # large CO vmr ~ all NOy is from EPP
     cond1 = (_mv8_co > co_high) | (_mv8_noy > (ch4_const + _mv8_ch4 * ch4_fac))
     _epp_noy += xr.where(cond1, _epp_noy0, 0.)
-    
+
     # SH data
     _epp_noy += xr.where(
         ~cond1 & (_lat <= 0.) & (_mv8_co > co_low) & (_mv8_coch4 > co_ch4_min),
