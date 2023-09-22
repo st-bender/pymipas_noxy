@@ -318,6 +318,41 @@ def process_day_single(
     dim="geo_id",
     **kwargs,
 ):
+    """Daily background and EPP NOy calculation using a single profiles
+
+    Calculate daily EPP-NOy contents based on the correlations
+    of NOy with CH4 and on thresholds based on the CO.
+    Combines the correlation selection and background/EPP handling
+    for easier use. Subtracts and fine-tunes the background-NOy
+    by iterating over all profiles separately.
+
+    Parameters
+    ----------
+    ds: `xarray.Dataset`
+        Combined dataset containing the trace gas data,
+        including the vmrs of CO, CH4, and NOy.
+    corr_ds: `xarray.Dataset`
+        Dataset containing the NOy/CH4 correlation values.
+    ch4_var: str
+        Name of the dataset variable containing the CH4 vmr.
+    co_var: str
+        Name of the dataset variable containing the CO vmr.
+    noy_var: str
+        Name of the dataset variable containing the NOy vmr.
+    dim: str, optional (default: "geo_id")
+        The dimension along which the profiles are iterated,
+        e.g. "time" or "geo_id".
+    **kwargs: dict
+        Keyword arguments passed to `epp_noy_single()`.
+
+    Returns
+    -------
+    epp_noy: `xarray.DataArray`
+
+    See Also
+    --------
+    epp_noy_single
+    """
     corr_ds_sel = corr_ds.sel(
         time=ds.time.dt.floor("D"),
         latitude=ds.latitude,
@@ -341,6 +376,43 @@ def process_day_multi1(
     dim="geo_id",
     **kwargs,
 ):
+    """Daily background and EPP NOy calculation using all profiles
+
+    Calculate daily EPP-NOy contents based on the correlations
+    of NOy with CH4 and on thresholds based on the CO.
+    Combines the correlation selection and background/EPP handling
+    for easier use. Subtracts and fine-tunes the background-NOy
+    by processing all profiles simultaneously.
+    Variant 1 by interpolating the background correlated NOy amount
+    per individual profile.
+
+    Parameters
+    ----------
+    ds: `xarray.Dataset`
+        Combined dataset containing the trace gas data,
+        including the vmrs of CO, CH4, and NOy.
+    corr_ds: `xarray.Dataset`
+        Dataset containing the NOy/CH4 correlation values.
+    ch4_var: str
+        Name of the dataset variable containing the CH4 vmr.
+    co_var: str
+        Name of the dataset variable containing the CO vmr.
+    noy_var: str
+        Name of the dataset variable containing the NOy vmr.
+    dim: str, optional (default: "geo_id")
+        The dimension along which the profiles are iterated,
+        e.g. "time" or "geo_id".
+    **kwargs: dict
+        Keyword arguments passed to `epp_noy_single()`.
+
+    Returns
+    -------
+    epp_noy: `xarray.DataArray`
+
+    See Also
+    --------
+    epp_noy_multi, process_day_multi2
+    """
     corr_ds_sel = corr_ds.sel(
         time=ds.time.dt.floor("D"),
         latitude=ds.latitude,
@@ -363,6 +435,43 @@ def process_day_multi2(
     ch4_var, co_var, noy_var,
     **kwargs,
 ):
+    """Daily background and EPP NOy calculation using a single profiles
+
+    Calculate daily EPP-NOy contents based on the correlations
+    of NOy with CH4 and on thresholds based on the CO.
+    Combines the correlation selection and background/EPP handling
+    for easier use. Subtracts and fine-tunes the background-NOy
+    by processing all profiles simultaneously.
+    Variant 2 by interpolating the background correlated NOy amount
+    per hemisphere.
+
+    Parameters
+    ----------
+    ds: `xarray.Dataset`
+        Combined dataset containing the trace gas data,
+        including the vmrs of CO, CH4, and NOy.
+    corr_ds: `xarray.Dataset`
+        Dataset containing the NOy/CH4 correlation values.
+    ch4_var: str
+        Name of the dataset variable containing the CH4 vmr.
+    co_var: str
+        Name of the dataset variable containing the CO vmr.
+    noy_var: str
+        Name of the dataset variable containing the NOy vmr.
+    dim: str, optional (default: "geo_id")
+        The dimension along which the profiles are iterated,
+        e.g. "time" or "geo_id".
+    **kwargs: dict
+        Keyword arguments passed to `epp_noy_single()`.
+
+    Returns
+    -------
+    epp_noy: `xarray.DataArray`
+
+    See Also
+    --------
+    epp_noy_multi, process_day_multi1
+    """
     _ti = np.unique(ds.time.dt.floor("D"))
     corr_ds_sel = corr_ds.sel(time=_ti[0], method="nearest")
     if ch4_var + "_bins" in corr_ds_sel.dims:
