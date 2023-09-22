@@ -124,9 +124,20 @@ def epp_noy_single(
     _mv8_noy = ds[noy_var]
     _mv8_coch4 = _mv8_co * _mv8_ch4
     _mv8_tpot = ds.T_pot
+    try:
+        # check if it is a named DataArray
+        _name = corr_ds.name
+    except AttributeError:
+        # Otherwise probably a Dataset, use the default "mean"
+        _name = "mean"
+    # `.reset_coords()` converts the unused coordinates to variables
+    # returning a Dataset.
+    # Converts it back to a DataArray by selecting the named variable,
+    # either from the DataArray passed to the function, or using the
+    # default name ("mean").
     _bg_noy = _noy_ch4.interp(
         {ch4_var: _mv8_ch4}, kwargs=dict(fill_value="extrapolate"),
-    ).reset_coords()["mean"]
+    ).reset_coords()[_name]
     _epp_noy0 = _mv8_noy - _bg_noy
     if tpot_limits is None:
         _potn = tpot_at_noych4_min(ds, arange=(22, 44))
@@ -265,7 +276,7 @@ def epp_noy_multi(
     _mv8_noy = ds[noy_var]
     _mv8_coch4 = _mv8_co * _mv8_ch4
     _mv8_tpot = ds.T_pot
-    _bg_noy = corr_ds["mean"]
+    _bg_noy = corr_ds
     _epp_noy0 = _mv8_noy - _bg_noy
 
     if tpot_limits is None:

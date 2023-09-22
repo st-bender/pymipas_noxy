@@ -339,7 +339,7 @@ def main(
             # Subtract the background NOy
             noy_bg_epp_da = combined.groupby("time.date").apply(
                 process_day_multi2,
-                args=(hh_ds, "vmr_ch4", "vmr_co", "vmr_noy",),
+                args=(hh_ds["mean"], "vmr_ch4", "vmr_co", "vmr_noy",),
                 **out_target_conf.get("sub", {}),
             )
             if "vmr_ch4" in noy_bg_epp_da.coords:
