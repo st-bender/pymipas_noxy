@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 from astropy import constants as ac, units as au
 
 # %%
-from .correlate import histogram2d, hist_mean, hist_median, hist_mode, hist_var
+from .correlate import histogram2d, hist_stats_ds
 from .units import to_unit
 
 # %%
@@ -191,36 +191,6 @@ def plot_day_zms(
 
 
 # %%
-def hist_stats_ds(hist_da, ch4_var, noy_var, min_pts=0, min_tot=0):
-    ch4_binv = ch4_var + "_bins"
-    noy_binv = noy_var + "_bins"
-    _hist_da = xr.where(hist_da >= min_pts, hist_da, 0.)
-    _hist_mean = hist_mean(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
-    _hist_median = hist_median(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
-    _hist_mode = hist_mode(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
-    _hist_var = hist_var(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
-    _hist_sum = _hist_da.sum(noy_binv)
-    _hist_sum.attrs = {"long_name": "number of data points", "units": "1"}
-    _hist_var = np.interp(
-        hist_da[ch4_binv],
-        _hist_var.dropna(ch4_binv)[ch4_binv],
-        _hist_var.dropna(ch4_binv),
-    )
-    ret = xr.Dataset({
-        "npts": _hist_sum,
-        "mode": _hist_mode.to_unit("ppm"),
-        "median": _hist_median.to_unit("ppm"),
-        "mean": _hist_mean.to_unit("ppm"),
-        "std": (ch4_binv, np.sqrt(_hist_var), _hist_mean.to_unit("ppm").attrs),
-        "histogram": hist_da,
-    })
-    # ret = ret.where(ret.npts > min_tot)
-    ret.attrs.update(hist_da.attrs)
-    logger.debug(ret)
-    return ret
-
-
-# %%
 def potential_temperature(pressure, temperature):
     tpot = temperature / ((pressure / (1000. * au.hPa))**(0.286))
     tpot = tpot.to_unit("K")
@@ -291,6 +261,7 @@ def calc_noy_bg_epp(
         "Potential temperature threshold used [K]": tpot_thresh or "none",
     }
     hist_sds = hist_sds.expand_dims(latitude=[np.nanmean(corr_lats)])
+    logger.debug("histogram ds: %s", hist_sds)
     return hist_sds
 
 

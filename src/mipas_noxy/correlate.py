@@ -23,6 +23,8 @@ import xarray as xr
 
 from scipy.stats import gaussian_kde
 
+from .units import to_unit
+
 
 # %%
 def histogram2d_colwise(ds, x, y, x_edges, y_edges, density=False):
@@ -248,3 +250,32 @@ def hist_var(hist_da, x_var, y_var, min_hpts=0):
     _hist_var = xr.where(hist_da.sum(y_var) >= min_hpts, _h_var, np.nan)
     debug("var: %s", _hist_var)
     return _hist_var
+
+
+# %%
+def hist_stats_ds(hist_da, ch4_var, noy_var, min_pts=0, min_tot=0):
+    ch4_binv = ch4_var + "_bins"
+    noy_binv = noy_var + "_bins"
+    _hist_da = xr.where(hist_da >= min_pts, hist_da, 0.)
+    _hist_mean = hist_mean(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
+    _hist_median = hist_median(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
+    _hist_mode = hist_mode(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
+    _hist_var = hist_var(_hist_da, ch4_binv, noy_binv, min_hpts=min_tot)
+    _hist_sum = _hist_da.sum(noy_binv)
+    _hist_sum.attrs = {"long_name": "number of data points", "units": "1"}
+    _hist_var = np.interp(
+        hist_da[ch4_binv],
+        _hist_var.dropna(ch4_binv)[ch4_binv],
+        _hist_var.dropna(ch4_binv),
+    )
+    ret = xr.Dataset({
+        "npts": _hist_sum,
+        "mode": _hist_mode.to_unit("ppm"),
+        "median": _hist_median.to_unit("ppm"),
+        "mean": _hist_mean.to_unit("ppm"),
+        "std": (ch4_binv, np.sqrt(_hist_var), _hist_mean.to_unit("ppm").attrs),
+        "histogram": hist_da,
+    })
+    # ret = ret.where(ret.npts > min_tot)
+    ret.attrs.update(hist_da.attrs)
+    return ret
