@@ -475,7 +475,8 @@ def calc_Ntot(
     dlambda = np.diff(np.sin(np.radians(xr.plot.utils._infer_interval_breaks(zm_ds.latitude))))
     dr = np.abs(np.gradient(zm_ds.altitude, axis=vaxis)) * alt_unit
     rr = ac.R_earth + zm_ds.altitude.values * alt_unit
-    dvol = 2 * np.pi * (rr**2 * dr).si * dlambda[:, None]
+    dvol = 2 * np.pi * (rr**2 * dr) * dlambda[:, None]
+    dvol = dvol.to("m3")
     dvol_vdim = zm_ds.altitude.dims[vaxis]
     zm_ds["dvol"] = (
         ("latitude", dvol_vdim), dvol,
