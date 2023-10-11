@@ -365,6 +365,9 @@ def main(
                 )
                 mv8_noy1 = fixup_altitudes(mv8_noy1)
                 mv8_noy1.attrs.update(out_target_conf.get("attrs", {}))
+                mv8_noy1.attrs.update({
+                    "date_created": pd.Timestamp.utcnow().isoformat()
+                })
                 debug("MIPAS v8 EPP-NOy ds fixed: %s", mv8_noy1)
 
                 # Construct file/path name for output species
