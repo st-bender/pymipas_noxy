@@ -444,6 +444,7 @@ def calc_Ntot(
     ds,
     dlat=5.0,
     dim="geo_id",
+    vaxis=-1,  # vertical/radial axis for dr
 ):
     #p_unit = getattr(au, ds.pressure.attrs["units"])
     #T_unit = getattr(au, ds.temperature.attrs["units"])
@@ -472,11 +473,12 @@ def calc_Ntot(
     alt_unit = au.Unit(ds.altitude.attrs["units"])
     # dlambda = (np.cos(np.radians(zm_ds.latitude)) * np.radians(dlat)).values
     dlambda = np.diff(np.sin(np.radians(xr.plot.utils._infer_interval_breaks(zm_ds.latitude))))
-    dr = np.gradient(zm_ds.altitude) * alt_unit
+    dr = np.abs(np.gradient(zm_ds.altitude, axis=vaxis)) * alt_unit
     rr = ac.R_earth + zm_ds.altitude.values * alt_unit
     dvol = 2 * np.pi * (rr**2 * dr).si * dlambda[:, None]
+    dvol_vdim = zm_ds.altitude.dims[vaxis]
     zm_ds["dvol"] = (
-        ("latitude", "altitude"), dvol,
+        ("latitude", dvol_vdim), dvol,
         {"long_name": "volume element", "standard_name": "air_volume", "units": dvol.unit}
     )
     for _v in filter(lambda _v: _v.startswith("nd_"), zm_ds.data_vars):
