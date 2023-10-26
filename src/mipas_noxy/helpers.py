@@ -65,7 +65,7 @@ def g_weights(xs, μ, σ):
 
 
 # %%
-def smooth_targets(a, b):
+def smooth_targets(a, b, variable="target"):
     # cap altitude range to the one common to both
     # aa = a.sel(altitude=slice(0, np.minimum(a.altitude.max(), b.altitude.max())))
     aa = a
@@ -88,7 +88,7 @@ def smooth_targets(a, b):
         # output_core_dims=[["out_alt", "altitude", "geo_id"]],
         join="outer",
     )
-    smooth_b = smooth_mat.dot(b.target, dims="altitude")
+    smooth_b = smooth_mat.dot(b[variable], dims="altitude")
     smooth_b = smooth_b.rename({"out_alt": "altitude"})
     return smooth_b
 
