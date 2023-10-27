@@ -422,6 +422,17 @@ def calc_zms(
     # weight sum per bin
     zm_wsum = (weights).groupby_bins("latitude", lat_edges, labels=lat_cntrs).sum(dim=dim)
     zm_ds = zm_wdsum / zm_wsum
+
+    # Weight sum and normal count in bin
+    zm_ds["wsum"] = zm_wsum["target"]
+    zm_ds["wsum"].attrs = {"long_name": "sum of weights in bin", "units": "1"}
+    zm_ds["ncount"] = ds["target"].groupby_bins(
+        "latitude", lat_edges, labels=lat_cntrs,
+    ).count(dim=dim)
+    zm_ds["ncount"].attrs = {
+        "long_name": "number of data points in bin", "units": "1",
+    }
+
     if "latitude" in zm_ds:
         # rename old latitudes first
         zm_ds = zm_ds.rename({"latitude": "lat_orig"})
