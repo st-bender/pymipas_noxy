@@ -219,6 +219,7 @@ def calc_noy_bg_epp(
     tpot_thresh=None,
     min_pts=0,
     min_tot=40,
+    smooth_hist=None,
     copy_vars=["latitude", "lat_bnds", "longitude", "lon_bnds", "time_bnds"],
 ):
     corr_alts = alt_range
@@ -254,6 +255,16 @@ def calc_noy_bg_epp(
     hist_da = histogram2d(_ds, ch4_var, noy_var, ch4_bin_edges, noy_bin_edges, density=False)
     # hist_da = histogram2d_kde(_ds, ch4_var, noy_var, ch4_bin_edges, noy_bin_edges, dims=("altitude", "geo_id"))
     _hist_da = xr.where(hist_da >= min_pts, hist_da, 0.)
+    if smooth_hist is not None:
+        # In the IDL code, the histogram is filtered (3 times) through
+        # a boxcar running average of 4 points along the NOy axis.
+        # For IDL compatibility, pass `smooth_hist=4`.
+        for _ in range(3):
+            _hist_da = _hist_da.rolling(
+                {noy_var + "_bins": smooth_hist},
+                center=True,
+            ).mean()
+            logger.debug("smoothed hist: %s", _hist_da)
 
     logger.info("min %d histogram points", min_tot)
     ## %%
