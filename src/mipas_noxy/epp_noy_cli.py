@@ -326,6 +326,15 @@ def main(
                 combined.to_netcdf(cnc_fpname) #, unlimited_dims=["geo_id"])
                 info("Combined data set saved to: %s", cnc_fpname)
 
+            # Use `pop` here, the rest is passed to `calc_noy_bg_epp()`
+            akd_ch4_thr = cthr_conf.pop("ch4_akd", None)
+            info("CH4 akd threshold: %s", akd_ch4_thr)
+            if akd_ch4_thr is not None:
+                _vv = list(
+                    filter(lambda _v: "altitude" in combined[_v].dims, combined.data_vars)
+                )
+                combined[_vv] = combined[_vv].where(combined["akd_ch4"] > akd_ch4_thr)
+
             bg_file = out_target_conf.get("bg_file", None)
             if bg_file is None:
                 info("Calculating (monthly) NOy/CH4 background correlation.")
