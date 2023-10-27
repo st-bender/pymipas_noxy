@@ -413,6 +413,7 @@ def main(
                     noy_bg_epp,
                     dlat=zm_dlat,
                     dim="geo_id",
+                    variable="vmr_noy",
                 )
                 fig = plot_day_zms(
                     zms["vmr_noy_epp"].to_unit("ppb"),
