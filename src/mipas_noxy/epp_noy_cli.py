@@ -278,6 +278,14 @@ def main(
             smooth_ch4 = smooth_ch4.rename("ch4_vmr")
             smooth_ch4.attrs = mv8_ch4.target.attrs
             debug("smooth_ch4: %s", smooth_ch4)
+            # interpolate CH4 averaging kernel diagonal for data selection
+            smooth_ch4akd = mv8_ch4_id.akm_diagonal.interp(
+                altitude=mv8_noy_id.altitude,
+                kwargs=dict(bounds_error=False, fill_value="extrapolate"),
+            )
+            smooth_ch4akd = smooth_ch4akd.rename("ch4_akd")
+            smooth_ch4akd.attrs = mv8_ch4.akm_diagonal.attrs
+            debug("smooth_ch4akd: %s", smooth_ch4akd)
 
             # smooth_co = smooth_targets(mv8_noy_id, mv8_co_id)
             smooth_co = mv8_co_id.target.interp(
@@ -290,6 +298,7 @@ def main(
 
             combined = mv8_noy_id.copy()
             combined["vmr_ch4"] = smooth_ch4
+            combined["akd_ch4"] = smooth_ch4akd
             combined["vmr_co"] = smooth_co
             combined = combined.rename({"target": "vmr_noy"})
             combined["vmr_noy"].attrs["standard_name"] = "mole_fraction_of_noy_expressed_as_nitrogen_in_air"
