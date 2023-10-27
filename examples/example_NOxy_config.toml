@@ -7,7 +7,7 @@ version = 1
 resolution = "R"
 
 [output]
-path = "/oath/to/output/NOY/"
+path = "/path/to/output/NOY/"
 # single target
 targets = ["NOy"]
 ## or multiple targets
@@ -24,7 +24,7 @@ weights = [1, 1]
 
 [input.NOy]
 targets = ["NO", "NO2", "CLONO2", "N2O5", "HNO3", "HNO4"]
-versions = ["261", "261", "261", "261", "261", "262"] 
+versions = ["261", "261", "261", "261", "261", "262"]
 weights = [1, 1, 1, 2, 1, 1]
 
 # (multiple) time ranges passed to `xr.date_range()`
@@ -40,7 +40,8 @@ start = "20100101"
 end = "20100228"
 freq = "MS"
 
-## A longer time span in one go, even spanning multiple years
+## A longer time span in one go, even spanning multiple years,
+## missing data will be skipped.
 # [[times]]
 # start = "20100101"
 # end = "20121231"
