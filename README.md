@@ -82,6 +82,41 @@ and appropriately shaped arrays.
 
 ```
 
+### Opening MIPAS level-2 netcdf files
+
+The MIPAS level-2 netcdf files contain 2-D altitude coordinates which
+`xarray` can currently not deal with nicely. This module provide a convenience
+function to read those files:
+
+```python
+>>> from mipas_noxy import open_mipas_l2
+>>> open_mipas_l2("/path/to/mipas-level2-file.nc")
+
+```
+
+It also contains one that can combine multiple files into one data set,
+taking a glob-string or list of files:
+
+```python
+>>> from mipas_noxy import open_mfmipas_l2
+>>> open_mfmipas_l2("/path/to/mipas-level2-files*.nc")
+
+```
+
+### Command line interface
+
+A command line interface to combine different species to "NOx" or "NOy"
+(and possibly others)
+is available as `mipas_noxy <args>`, or using python's `-m` switch as
+`python -m mipas_noxy <args>`.
+The argument is basically the configuration file for processing,
+more command line options are listed by passing
+`-h` or `--help`: `mipas_noxy -h`.
+The processing is configured through a [toml](https://toml.io/en/) file,
+currently available options are described in the
+[example configuration file](./examples/example_NOxy_config.toml).
+
+
 Basic class and method documentation is accessible via `pydoc`:
 
 ```sh
