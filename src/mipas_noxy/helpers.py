@@ -410,7 +410,7 @@ def calc_zms(
 
     # skip time and string variables for zonal mean averaging.
     # zm_vars = [_v for _v in ds.data_vars if ds[_v].dtype.char not in "MS"]
-    zm_vars = list(filter(lambda _v: ds[_v].dtype.char not in "MS", ds.data_vars))
+    zm_vars = list(filter(lambda _v: ds[_v].dtype.char not in "MSOU", ds.data_vars))
     ds = ds.set_coords(("latitude",))  # set as coordinate for binning
 
     ds["weights"] = np.cos(ds["latitude"].to_unit(au.radian))
