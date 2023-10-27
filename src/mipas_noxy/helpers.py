@@ -402,6 +402,7 @@ def calc_zms(
     ds,
     dlat=5.0,
     dim="geo_id",
+    variable="target",  # for `ncount`
 ):
     # zonal means
     lat_edges = np.arange(-90, 90 + 0.5 * dlat, dlat)
@@ -424,9 +425,9 @@ def calc_zms(
     zm_ds = zm_wdsum / zm_wsum
 
     # Weight sum and normal count in bin
-    zm_ds["wsum"] = zm_wsum["target"]
+    zm_ds["wsum"] = zm_wsum[variable]
     zm_ds["wsum"].attrs = {"long_name": "sum of weights in bin", "units": "1"}
-    zm_ds["ncount"] = ds["target"].groupby_bins(
+    zm_ds["ncount"] = ds[variable].groupby_bins(
         "latitude", lat_edges, labels=lat_cntrs,
     ).count(dim=dim)
     zm_ds["ncount"].attrs = {
