@@ -65,7 +65,7 @@ def g_weights(xs, μ, σ):
 
 
 # %%
-def smooth_targets(a, b, variable="target"):
+def smooth_targets(a, b, smooth_vr=None, variable="target"):
     # cap altitude range to the one common to both
     # aa = a.sel(altitude=slice(0, np.minimum(a.altitude.max(), b.altitude.max())))
     aa = a
@@ -74,6 +74,12 @@ def smooth_targets(a, b, variable="target"):
         altitude=aa.altitude,
         kwargs=dict(bounds_error=False, fill_value=0.),
     )
+    # In the IDL code, both resolution vectors are filtered through
+    # a boxcar running average of 4 points before the convolution.
+    # For IDL compatibility, pass `smooth_vr=4`.
+    if smooth_vr is not None:
+        vr_a = vr_a.rolling(altitude=smooth_vr, center=True).mean()
+        vr_b = vr_b.rolling(altitude=smooth_vr, center=True).mean()
     _vr_diffsq = (vr_a**2 - vr_b**2)
     # _vr_diffsq = (vr_a**2)
     vr_diff = xr.where(_vr_diffsq > 0., np.sqrt(_vr_diffsq), 1e-12)
