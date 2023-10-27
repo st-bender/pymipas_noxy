@@ -18,12 +18,16 @@ targets = ["NOY", "CH4", "CO"]
 versions = ["261", "261", "261"]  # resolution = R
 # versions = ["61", "61", "61"]  # resolution = H
 weights = [1, 1, 1]
+# running mean for vertical resolutions for Gaussian smoothing of CH4
+smooth_vr = 4
 
 [correlation.thresholds]
 akm_thresh = 0.003
 co_thresh = 0.1
 # tpot_thresh = 1000
 min_pts = 15  # minimum points per histogram bin
+# running mean, run 3 times along the NOy-axis of the histogram
+smooth_hist = 4
 
 [[correlation.region]]
 # SH
