@@ -23,6 +23,7 @@ smooth_vr = 4
 
 [correlation.thresholds]
 akm_thresh = 0.003
+ch4_akd = 0.0  # 1e-12
 co_thresh = 0.1
 # tpot_thresh = 1000
 min_pts = 15  # minimum points per histogram bin
