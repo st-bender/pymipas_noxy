@@ -108,6 +108,51 @@ def _setup_bins(cbin_conf):
 
 
 # %%
+def _decode_strings(ds):
+    ret = ds.copy()
+    for v in filter(
+        lambda v: ds[v].dtype.char == "S",
+        set(ds.coords) | set(ds.data_vars)
+    ):
+        ret[v] = ds[v].astype("U")
+    return ret
+
+
+# %%
+def _exclude_extra(ds_l, config, target, dim="time", on="geo_id"):
+    # exclude from list of files given by the config key
+    # input.<target>.exclude = [a, b, c, ...]
+    # one entry per input species, no error checking yet
+    excl_files = config[target].get("exclude", [])
+    logger.info("extra exclude list files: %s", excl_files)
+    if not excl_files:
+        return ds_l
+    ret = []
+    ipath = config.get("path", ".")
+    for _ds, _f in zip(ds_l, excl_files):
+        # reduce "species" dim, should only be one,
+        # since this should be called before we merge the datasets
+        # _ds = _decode_strings(_ds).isel(species=0)
+        _ds = _ds.isel(species=0)
+        if not _f:
+            ret.append(_ds)
+            continue
+        _fp = path.join(ipath, _f)
+        excl_list = np.genfromtxt(_fp, delimiter=[22,], dtype=str)
+        excl_list = np.unique(excl_list)
+        remaining = sorted(set(_ds[on].values) - set(excl_list))
+        _ds_b = _ds.swap_dims({dim: on}).sel({on: remaining}).swap_dims({on: dim})
+        _species = _ds.species.values
+        logger.info(
+            "%s dataset reduced from %s to %s geo locations",
+            _species, _ds[dim].size, _ds_b[dim].size,
+        )
+        # expand "species" dimension again for compatibility
+        ret.append(_ds_b.reset_coords(on).expand_dims(species=[_species]))
+    return ret
+
+
+# %%
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"], show_default=True)
 
 
@@ -259,6 +304,12 @@ def main(
             debug("MIPAS v8 input list: %s", mv8_noy_l)
             if not mv8_noy_l:
                 continue
+
+            # convert strings to unicode strings
+            # mostly for matching the exclusion list(s)
+            mv8_noy_l = [_decode_strings(_ds) for _ds in mv8_noy_l]
+            # Fix exclusion
+            mv8_noy_l = _exclude_extra(mv8_noy_l, inp_conf, out_target)
 
             mv8_noy, mv8_ch4, mv8_co = mv8_noy_l
             mv8_noy = mv8_noy.isel(species=0)
