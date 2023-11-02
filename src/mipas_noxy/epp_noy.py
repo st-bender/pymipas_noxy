@@ -42,6 +42,9 @@ logger = logging.getLogger()
 # %%
 def tpot_at_noych4_min(ds, arange=(22, 44)):
     """Find potential temperature at NOy/CH4 minimum in range
+
+    Finds the potential temperature at the altitude where the
+    ratio NOy/CH4 has a minimum.
     """
     _ds_sel = ds.sel(altitude=slice(*arange))
     _min_ai = _ds_sel.noy_vs_ch4.argmin("altitude")
@@ -414,7 +417,7 @@ def process_day_multi1(
         The dimension along which the profiles are iterated,
         e.g. "time" or "geo_id".
     **kwargs: dict
-        Keyword arguments passed to `epp_noy_single()`.
+        Keyword arguments passed to `epp_noy_multi()`.
 
     Returns
     -------
@@ -473,7 +476,7 @@ def process_day_multi2(
         The dimension along which the profiles are iterated,
         e.g. "time" or "geo_id".
     **kwargs: dict
-        Keyword arguments passed to `epp_noy_single()`.
+        Keyword arguments passed to `epp_noy_multi()`.
 
     Returns
     -------
@@ -532,7 +535,7 @@ def integrate_eppnoy(
     """Integrates zonal mean columns for total number of molecules
 
     """
-    # all-nan array to return in case there is not enough data
+    # all-nan array to return in case there are not enough data
     empty = np.nan * xr.ones_like(
         ds[ntot_var].isel(altitude=[0], latitude=[0], drop=False),
     )
