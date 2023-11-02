@@ -471,9 +471,8 @@ def calc_zms(
 # %%
 def calc_Ntot(
     ds,
-    dlat=5.0,
-    dim="geo_id",
     vaxis=-1,  # vertical/radial axis for dr
+    **kwargs  # passed to `calc_zms()`
 ):
     #p_unit = getattr(au, ds.pressure.attrs["units"])
     #T_unit = getattr(au, ds.temperature.attrs["units"])
@@ -497,7 +496,7 @@ def calc_Ntot(
                 ),
         })
     # zonal means
-    zm_ds = calc_zms(nd_ds, dlat=dlat, dim=dim)
+    zm_ds = calc_zms(nd_ds, **kwargs)
     # volume element
     alt_unit = au.Unit(ds.altitude.attrs["units"])
     # dlambda = (np.cos(np.radians(zm_ds.latitude)) * np.radians(dlat)).values
