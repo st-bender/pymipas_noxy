@@ -18,6 +18,7 @@ targets = ["NOY", "CH4", "CO"]
 versions = ["261", "261", "261"]  # resolution = R
 # versions = ["61", "61", "61"]  # resolution = H
 weights = [1, 1, 1]
+exclude = ["exc_V8_NOY_all", "exc_V8_CH4_all", "exc_V8_CO_all"]
 # running mean for vertical resolutions for Gaussian smoothing of CH4
 smooth_vr = 4
 
