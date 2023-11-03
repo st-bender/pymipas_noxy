@@ -369,6 +369,7 @@ def main(
                 combined.pressure,
                 combined.temperature,
             )
+            combined = combined.swap_dims({"geo_id": "time"})
             debug("combined: %s", combined)
             if "combined" in out_files:
                 cnc_fname = f"{out_target}_combined_mipasv8_{date}.nc"
@@ -411,6 +412,7 @@ def main(
             noy_bg_epp_da = combined.groupby("time.date").apply(
                 process_day_multi2,
                 args=(hh_ds["mean"], "vmr_ch4", "vmr_co", "vmr_noy",),
+                dim="time",
                 **out_target_conf.get("sub", {}),
             )
             if "vmr_ch4" in noy_bg_epp_da.coords:
@@ -419,9 +421,9 @@ def main(
                 noy_bg_epp_da = noy_bg_epp_da.drop("latitude")
 
             if "epp_noy" in out_files:
-                mv8_noy1 = mv8_noy_id.copy()
+                mv8_noy1 = mv8_noy_id.swap_dims({"geo_id": "time"}).copy()
                 mv8_noy1["target"] = noy_bg_epp_da
-                mv8_noy1 = mv8_noy1.swap_dims({"geo_id": "time"}).reset_coords()
+                mv8_noy1 = mv8_noy1.reset_coords()
                 # Fixup to make the dataset compliant with
                 # the original v8 netcdf data sets.
                 # Use the "name" if set.
@@ -483,7 +485,7 @@ def main(
                 zms = calc_zms(
                     noy_bg_epp,
                     dlat=zm_dlat,
-                    dim="geo_id",
+                    dim="time",
                     variable="vmr_noy",
                 )
                 fig = plot_day_zms(
@@ -509,10 +511,11 @@ def main(
                 info("Histogram statsitics saved to: %s", hnc_fpname)
 
             if "epp_noy_tot" in out_files:
-                ntot_ds = noy_bg_epp.swap_dims({"geo_id": "time"}).resample(time="1d").apply(
+                ntot_ds = noy_bg_epp.resample(time="1d").apply(
                     calc_Ntot,
                     dlat=zm_dlat,
                     dim="time",
+                    variable="vmr_noy_epp",
                 )
                 debug("daily NOy content ds: %s", ntot_ds)
                 epp_noy_tot = ntot_ds.groupby("time").map(
