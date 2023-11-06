@@ -332,7 +332,7 @@ def process_day_single(
     dim="geo_id",
     **kwargs,
 ):
-    """Daily background and EPP NOy calculation using a single profiles
+    """Daily background and EPP NOy calculation using single profiles
 
     Calculate daily EPP-NOy contents based on the correlations
     of NOy with CH4 and on thresholds based on the CO.
@@ -449,7 +449,7 @@ def process_day_multi2(
     ch4_var, co_var, noy_var,
     **kwargs,
 ):
-    """Daily background and EPP NOy calculation using a single profiles
+    """Daily background and EPP NOy calculation using all profiles
 
     Calculate daily EPP-NOy contents based on the correlations
     of NOy with CH4 and on thresholds based on the CO.
@@ -457,7 +457,7 @@ def process_day_multi2(
     for easier use. Subtracts and fine-tunes the background-NOy
     by processing all profiles simultaneously.
     Variant 2 by interpolating the background correlated NOy amount
-    per hemisphere.
+    per hemisphere, faster than variant 1.
 
     Parameters
     ----------
