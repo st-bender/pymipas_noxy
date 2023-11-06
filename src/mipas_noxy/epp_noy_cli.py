@@ -272,6 +272,8 @@ def main(
     ch4_bin_edges, noy_bin_edges = _setup_bins(cbin_conf)
     debug("CH4 bins: %s", ch4_bin_edges)
     debug("NOy bins: %s", noy_bin_edges)
+    # Use `pop` here, the rest is passed to `calc_noy_bg_epp()`
+    akd_ch4_thr = cthr_conf.pop("ch4_akd", None)
 
     regions = corr_conf.get("region", [])
     if not hasattr(regions, "__getitem__") or isinstance(regions, str):
@@ -385,8 +387,6 @@ def main(
                 combined.to_netcdf(cnc_fpname, unlimited_dims=["time"])
                 info("Combined data set saved to: %s", cnc_fpname)
 
-            # Use `pop` here, the rest is passed to `calc_noy_bg_epp()`
-            akd_ch4_thr = cthr_conf.pop("ch4_akd", None)
             info("CH4 akd threshold: %s", akd_ch4_thr)
             if akd_ch4_thr is not None:
                 _vv = list(
