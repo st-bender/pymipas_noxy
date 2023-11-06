@@ -404,6 +404,11 @@ def main(
                     h_ds = ch4_noy_hist.expand_dims(time=[combined.time.mean().values])
                     h_dsl.append(h_ds)
                 hh_ds = xr.merge(h_dsl)
+                if len(regions) > 1:
+                    hh_ds.attrs.update({
+                        "Latitude range [degrees_north]":
+                        ", ".join(map(str, [reg["lat_range"] for reg in regions])),
+                    })
             else:
                 info("Using NOy/CH4 background correlation from: %s", bg_file)
                 hh_ds = xr.open_dataset(bg_file).load()
