@@ -305,6 +305,9 @@ def main(
             if not mv8_noy_l:
                 continue
 
+            for _ds in mv8_noy_l:
+                _ds["time"] = _ds.time.dt.round("1ms")
+
             # convert strings to unicode strings
             # mostly for matching the exclusion list(s)
             mv8_noy_l = [_decode_strings(_ds) for _ds in mv8_noy_l]
@@ -377,8 +380,9 @@ def main(
             if "combined" in out_files:
                 cnc_fname = f"{out_target}_combined_mipasv8_{date}.nc"
                 cnc_fpname = path.join(out_path, cnc_fname)
-                combined.time.encoding["units"] = "days since 2000-01-01"
-                combined.to_netcdf(cnc_fpname) #, unlimited_dims=["geo_id"])
+                combined.time.encoding["units"] = "milliseconds since 2000-01-01"
+                combined.time.encoding["dtype"] = np.int64
+                combined.to_netcdf(cnc_fpname, unlimited_dims=["time"])
                 info("Combined data set saved to: %s", cnc_fpname)
 
             # Use `pop` here, the rest is passed to `calc_noy_bg_epp()`
@@ -517,7 +521,8 @@ def main(
             if bg_file is None and "hist" in out_files:
                 hnc_fname = f"{out_target}_hist_mipasv8_{date}{fig_suff}.nc"
                 hnc_fpname = path.join(out_path, hnc_fname)
-                hh_ds.time.encoding["units"] = "days since 2000-01-01"
+                hh_ds.time.encoding["units"] = "nanoseconds since 2000-01-01"
+                hh_ds.time.encoding["dtype"] = np.int64
                 hh_ds.to_netcdf(hnc_fpname, unlimited_dims=["time"])
                 info("Histogram statsitics saved to: %s", hnc_fpname)
 
@@ -539,7 +544,8 @@ def main(
                 tnc_fpname = path.join(out_path, tnc_fname)
                 # convert to dataset for netcdf
                 epp_noy_tot_ds = epp_noy_tot.to_dataset()
-                epp_noy_tot_ds.time.encoding["units"] = "days since 2000-01-01"
+                epp_noy_tot_ds.time.encoding["units"] = "milliseconds since 2000-01-01"
+                epp_noy_tot_ds.time.encoding["dtype"] = np.int64
                 epp_noy_tot_ds.attrs["config"] = str(config)
                 epp_noy_tot_ds.transpose("time", "altitude", "latitude").to_netcdf(
                     tnc_fpname, unlimited_dims=["time"],
