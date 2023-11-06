@@ -277,8 +277,10 @@ def calc_noy_bg_epp(
         "CO threshold used [ppm]": co_thresh or "none",
         "AKM diagonal threshold used [1]": akm_thresh or "none",
         "Potential temperature threshold used [K]": tpot_thresh or "none",
+        "Histogramm boxcar size [NOy pts]": smooth_hist or "none",
     })
     hist_sds = hist_sds.expand_dims(latitude=[np.nanmean(corr_lats)])
+    hist_sds.latitude.attrs = ds.latitude.attrs
     logger.debug("histogram ds: %s", hist_sds)
     return hist_sds
 
