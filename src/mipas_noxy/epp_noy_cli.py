@@ -376,12 +376,12 @@ def main(
             combined.attrs.update({
                 "Vertical resolution boxcar size [pts]": smooth_vr or "none",
             })
+            combined.time.encoding["units"] = "milliseconds since 2000-01-01"
+            combined.time.encoding["dtype"] = np.int64
             debug("combined: %s", combined)
             if "combined" in out_files:
                 cnc_fname = f"{out_target}_combined_mipasv8_{date}.nc"
                 cnc_fpname = path.join(out_path, cnc_fname)
-                combined.time.encoding["units"] = "milliseconds since 2000-01-01"
-                combined.time.encoding["dtype"] = np.int64
                 combined.to_netcdf(cnc_fpname, unlimited_dims=["time"])
                 info("Combined data set saved to: %s", cnc_fpname)
 
