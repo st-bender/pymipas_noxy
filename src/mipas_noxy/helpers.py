@@ -269,14 +269,14 @@ def calc_noy_bg_epp(
     logger.info("min %d histogram points", min_tot)
     ## %%
     hist_sds = hist_stats_ds(_hist_da, ch4_var, noy_var, min_pts=0, min_tot=min_tot)
-    hist_sds.attrs = {
+    hist_sds.attrs.update({
         "Altitude range [km]": corr_alts,
         "Latitude range [degrees_north]": corr_lats,
         "CH4 threshold used [ppm]": ch4_thresh or "none",
         "CO threshold used [ppm]": co_thresh or "none",
         "AKM diagonal threshold used [1]": akm_thresh or "none",
         "Potential temperature threshold used [K]": tpot_thresh or "none",
-    }
+    })
     hist_sds = hist_sds.expand_dims(latitude=[np.nanmean(corr_lats)])
     logger.debug("histogram ds: %s", hist_sds)
     return hist_sds

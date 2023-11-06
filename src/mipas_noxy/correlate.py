@@ -277,5 +277,4 @@ def hist_stats_ds(hist_da, ch4_var, noy_var, min_pts=0, min_tot=0):
         "histogram": hist_da,
     })
     # ret = ret.where(ret.npts > min_tot)
-    ret.attrs.update(hist_da.attrs)
     return ret
