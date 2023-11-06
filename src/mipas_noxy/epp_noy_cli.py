@@ -370,6 +370,9 @@ def main(
                 combined.temperature,
             )
             combined = combined.swap_dims({"geo_id": "time"})
+            combined.attrs.update({
+                "Vertical resolution boxcar size [pts]": smooth_vr or "none",
+            })
             debug("combined: %s", combined)
             if "combined" in out_files:
                 cnc_fname = f"{out_target}_combined_mipasv8_{date}.nc"
@@ -386,6 +389,9 @@ def main(
                     filter(lambda _v: "altitude" in combined[_v].dims, combined.data_vars)
                 )
                 combined[_vv] = combined[_vv].where(combined["akd_ch4"] > akd_ch4_thr)
+            combined.attrs.update({
+                "CH4 AKM diagonal threshold used [1]": akd_ch4_thr or "none",
+            })
 
             bg_file = out_target_conf.get("bg_file", None)
             if bg_file is None:
