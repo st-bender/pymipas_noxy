@@ -269,6 +269,7 @@ def calc_noy_bg_epp(
     logger.info("min %d histogram points", min_tot)
     ## %%
     hist_sds = hist_stats_ds(_hist_da, ch4_var, noy_var, min_pts=0, min_tot=min_tot)
+    hist_sds.attrs.update(ds.attrs)
     hist_sds.attrs.update({
         "Altitude range [km]": corr_alts,
         "Latitude range [degrees_north]": corr_lats,
