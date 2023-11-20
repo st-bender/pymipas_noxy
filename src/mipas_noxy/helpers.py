@@ -261,8 +261,9 @@ def calc_zms(
     zm_vars = list(filter(lambda _v: ds[_v].dtype.char not in "MSOU", ds.data_vars))
     ds = ds.set_coords(("latitude",))  # set as coordinate for binning
 
-    ds["weights"] = np.cos(ds["latitude"].to_unit(au.radian))
-    weights = (ds[zm_vars] * 0. + 1.) * ds["weights"]
+    weights = np.cos(ds["latitude"].to_unit(au.radian))
+    weights.attrs = {"long_name": "cosine of latitude", "units": "1"}
+    weights = weights.where(ds[zm_vars].notnull())
     weights = weights.fillna(0.)
     # weighted data sum per bin
     zm_wdsum = (ds[zm_vars] * weights).groupby_bins(
