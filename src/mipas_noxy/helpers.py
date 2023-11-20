@@ -234,10 +234,6 @@ def sub_bg_noy(
     return ret
 
 
-# %% [markdown]
-# ## Zonal means
-
-
 # %%
 def weighted_zm(ds, dim="time", variable="target", weight_var="weights"):
     # In some cases the weights can have different dimensions than the data
