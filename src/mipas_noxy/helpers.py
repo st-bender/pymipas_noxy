@@ -297,6 +297,23 @@ def calc_zms(
         zm_ds = zm_ds.set_coords("time")
         # zm_ds = zm_ds.expand_dims(time=[ds.time.mean("time").dt.round("1ms").values])
 
+    # Note: the IDL code exports standard deviation and standard error
+    # from which one can obtain the number of data points.
+    ncnts = (weights[variable] > 0.0).groupby_bins(
+        "latitude", lat_edges, labels=lat_cntrs,
+    ).sum(dim=dim)
+    ncnts.attrs = {"long_name": "number of points in bin", "units": "1"}
+    # weighted standard deviations
+    zm_ds_wm = zm_ds[variable].drop("time").sel(latitude=ds.latitude, method="nearest")
+    wstds2_num1 = ((ds[variable] - zm_ds_wm)**2 * weights[variable]).groupby_bins(
+        "latitude", lat_edges, labels=lat_cntrs
+    ).sum(dim=dim)
+    wstds = np.sqrt(wstds2_num1 * ncnts / (zm_wsum[variable] * (ncnts - 1)))
+    wstds = wstds.rename({"latitude_bins": "latitude"})
+    # wstds = wstds.rename({v: v + "_std" for v in wstds.data_vars})
+    wstds = wstds.rename(variable + "_std")
+    zm_ds = xr.merge([zm_ds, wstds])
+
     return zm_ds
 
 
