@@ -10,7 +10,7 @@ meta_path = path.join("src", name, "__init__.py")
 here = path.abspath(path.dirname(__file__))
 
 extras_require = {
-    "epp_noy": ["astropy"],
+    "epp_noy": ["astropy", "xarray_simpleunits>=0.0.4"],
     "tests": ["pytest"],
 }
 extras_require["all"] = sorted(
