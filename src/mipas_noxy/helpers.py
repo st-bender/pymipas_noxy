@@ -293,9 +293,9 @@ def calc_zms(
         zm_ds.latitude.attrs = zm_ds.lat_orig.attrs
 
     if "time" in dim:
-        zm_ds["time"] = ds.time.mean("time").dt.round("s")
+        zm_ds["time"] = ds.time.mean("time").dt.round("1ms")
         zm_ds = zm_ds.set_coords("time")
-        # zm_ds = zm_ds.expand_dims(time=[ds.time.mean("time").dt.round("s").values])
+        # zm_ds = zm_ds.expand_dims(time=[ds.time.mean("time").dt.round("1ms").values])
 
     return zm_ds
 
