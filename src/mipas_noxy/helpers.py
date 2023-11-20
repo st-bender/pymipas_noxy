@@ -244,8 +244,9 @@ def weighted_zm(ds, dim="time", variable="target", weight_var="weights"):
     # and simply summing the weights does not normalize them correctly.
     # Broadcasts them to consistent shapes and normalization with `.sum()`.
     # NaNs in the data should also propagate this way and get zero weights.
-    weights = (ds[variable] * 0. + 1.) * ds[weight_var]
+    weights = ds[weight_var].where(ds[variable].notnull())
     weights = weights.fillna(0.)
+    weights.attrs = {"long_name": "weights", "units": "1"}
     ww = weights / weights.sum(dim)
     return (ds[variable] * ww).sum(dim)
 
