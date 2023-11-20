@@ -342,3 +342,28 @@ def fixup_altitudes(ds, alt_name="alt"):
     # rename it to be consistent with the input nc files.
     ds = ds.rename({alt_name: "altitude"})
     return ds
+
+
+def select_common_data(dss, dim="time", on="geo_id"):
+    """Select common IDs in datasets
+
+    Selects the datasets according to their common (unique) IDs,
+    e.g. the `geo_id` time stamp for MIPAS V8.
+
+    Parameters
+    ----------
+    dss: list of `xarray.Dataset`
+        List of datasets to be combined, based on their common geo_ids.
+    dim: str, optional (default: time)
+        Dimension along which the ID variable is to be selected.
+    on: str, optional (default: geo_id)
+        Variable that contains the (unique) IDs in each dataset.
+
+    Returns
+    -------
+    ret: list of `xarray.Dataset`
+        List of the datasets, trimmed to the common (unique) IDs.
+    """
+    _ids = sorted(set.intersection(*map(set, map(lambda d: d[on].values, dss))))
+    ret = [d.swap_dims({dim: on}).sel({on: _ids}).swap_dims({on: dim}) for d in dss]
+    return ret

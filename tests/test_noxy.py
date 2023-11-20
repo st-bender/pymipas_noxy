@@ -3,7 +3,7 @@
 import numpy as np
 import xarray as xr
 
-from mipas_noxy.util import combine_NOxy, calculate_NOxy, fixup_target_name
+from mipas_noxy.util import combine_NOxy, calculate_NOxy, fixup_target_name, select_common_data
 
 GEO_IDS = np.array(
     [b"00001_20000101T000001Z", b"00002_20000101T000101Z", b"00003_20000101T000201Z"]
@@ -86,3 +86,18 @@ def test_fixup_target_name():
     assert noxy.target.attrs["long_name"] == "volume mixing ratio of NOY"
     assert noxy.target.attrs["standard_name"] == "mole_fraction_of_noy_expressed_as_nitrogen_in_air"
     assert noxy.attrs["retrieval_target_name"] == "NOY"
+
+
+def test_select_common():
+    dss = _prep_dss()
+    dss = [ds.isel(species=0) for ds in dss]
+    sel = (select_common_data(dss, on="geo_id"))
+    for ds in sel:
+        np.testing.assert_equal(
+            ds["geo_id"].values,
+            [b"00001_20000101T000001Z", b"00003_20000101T000201Z"],
+        )
+        np.testing.assert_equal(
+            ds["time"].values,
+            np.array(["2000-01-01T00:00:01", "2000-01-01T00:02:01"], dtype="M8"),
+        )
