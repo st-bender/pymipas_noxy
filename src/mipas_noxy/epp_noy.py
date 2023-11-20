@@ -126,6 +126,7 @@ def epp_noy_single(
     _mv8_co = ds[co_var]
     _mv8_noy = ds[noy_var]
     _mv8_coch4 = _mv8_co * _mv8_ch4
+    _mv8_coch4n = 1.0 + 0. * _mv8_co  # in IDL
     _mv8_tpot = ds.T_pot
     try:
         # check if it is a named DataArray
@@ -169,7 +170,7 @@ def epp_noy_single(
         ggn = np.where(_mv8_tpot >= _potn)[0][0:5]
         _ratio_n = np.maximum(0, (_epp_noy0[ggn] / _mv8_co[ggn]).mean())
         _epp_noy += xr.where(
-            ~cond1 & (_mv8_co > co_low) & (_mv8_coch4 > co_ch4_min),
+            ~cond1 & (_mv8_co > co_low) & (_mv8_coch4n > co_ch4_min),
             xr.where(
                 (_mv8_tpot < _potn) & ((_epp_noy0 / _mv8_co) > _ratio_n),
                 _mv8_co * _ratio_n,
@@ -278,6 +279,7 @@ def epp_noy_multi(
     _mv8_co = ds[co_var]
     _mv8_noy = ds[noy_var]
     _mv8_coch4 = _mv8_co * _mv8_ch4
+    _mv8_coch4n = 1.0 + 0. * _mv8_co  # in IDL
     _mv8_tpot = ds.T_pot
     _bg_noy = corr_ds
     _epp_noy0 = _mv8_noy - _bg_noy
@@ -309,7 +311,7 @@ def epp_noy_multi(
     )
     # NH data
     _epp_noy += xr.where(
-        ~cond1 & (_lat > 0.) & (_mv8_co > co_low) & (_mv8_coch4 > co_ch4_min),
+        ~cond1 & (_lat > 0.) & (_mv8_co > co_low) & (_mv8_coch4n > co_ch4_min),
         xr.where(
             (_mv8_tpot < _potn) & ((_epp_noy0 / _mv8_co) > _ratio_n),
             _mv8_co * _ratio_n,
