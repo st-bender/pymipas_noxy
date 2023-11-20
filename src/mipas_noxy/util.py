@@ -102,6 +102,11 @@ def open_mipas_l2(file, **kwargs):
         mipv8_ds = mipv8_ds.rename({"altgrid": "altitude"})
     if "timegrid" in mipv8_ds.dims:
         mipv8_ds = mipv8_ds.swap_dims({"timegrid": "time"})
+    # Round time to 1 millisecond.
+    # Typically the `time` variable comes as double precision
+    # days since .... which is only accurate to a few 10s µs.
+    # The `geo_id`s are based on seconds, so milliseconds should be good enough.
+    mipv8_ds["time"] = mipv8_ds.time.dt.round("1ms")
     # harmonize dtypes to avoid big/little endian mixup
     _dtype = mipv8_ds.target.dtype
     # Fix altitude naming and coordinates
