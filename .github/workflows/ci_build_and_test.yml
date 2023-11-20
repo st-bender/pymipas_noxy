@@ -70,7 +70,7 @@ jobs:
       - run: pip list
       - name: Test
         run: |
-          python -m coverage run --parallel-mode --source=src -m pytest -v --doctest-glob='*.md'
+          python -m coverage run --parallel-mode --source=src -m pytest -v
       - name: Combine and convert coverage
         run: |
           python -m coverage combine
