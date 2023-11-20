@@ -28,7 +28,7 @@ from astropy import constants as ac, units as au
 
 # %%
 from .correlate import histogram2d, hist_stats_ds
-from .units import to_unit
+from .units import *
 
 # %%
 logging.basicConfig(

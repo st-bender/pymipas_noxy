@@ -23,7 +23,7 @@ import xarray as xr
 
 from scipy.stats import gaussian_kde
 
-from .units import to_unit
+from .units import *
 
 
 # %%
