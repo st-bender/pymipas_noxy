@@ -62,6 +62,14 @@ def g_weights(xs, μ, σ):
 
 
 # %%
+def idl_smooth(d, dim, n):
+    if not n % 2:
+        n = n + 1
+    ret = d.rolling(center=True, min_periods=n, **{dim: n}).mean(dim).fillna(d)
+    return ret
+
+
+# %%
 def smooth_targets(a, b, smooth_vr=None, variable="target"):
     # cap altitude range to the one common to both
     # aa = a.sel(altitude=slice(0, np.minimum(a.altitude.max(), b.altitude.max())))
@@ -75,8 +83,8 @@ def smooth_targets(a, b, smooth_vr=None, variable="target"):
     # a boxcar running average of 4 points before the convolution.
     # For IDL compatibility, pass `smooth_vr=4`.
     if smooth_vr is not None:
-        vr_a = vr_a.rolling(altitude=smooth_vr, center=True).mean()
-        vr_b = vr_b.rolling(altitude=smooth_vr, center=True).mean()
+        vr_a = idl_smooth(vr_a, "altitude", smooth_vr)
+        vr_b = idl_smooth(vr_b, "altitude", smooth_vr)
     _vr_diffsq = (vr_a**2 - vr_b**2)
     # _vr_diffsq = (vr_a**2)
     vr_diff = xr.where(_vr_diffsq > 0., np.sqrt(_vr_diffsq), 1e-12)
@@ -160,10 +168,7 @@ def calc_noy_bg_epp(
         # a boxcar running average of 4 points along the NOy axis.
         # For IDL compatibility, pass `smooth_hist=4`.
         for _ in range(3):
-            _hist_da = _hist_da.rolling(
-                {noy_var + "_bins": smooth_hist},
-                center=True,
-            ).mean()
+            _hist_da = idl_smooth(_hist_da, noy_var + "_bins", smooth_hist)
             logger.debug("smoothed hist: %s", _hist_da)
 
     logger.info("min %d histogram points", min_tot)
