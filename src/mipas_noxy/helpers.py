@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vim:fileencoding=utf-8
+# vim:fileencoding=utf-8:et
 #
 # Copyright (c) 2023 Stefan Bender
 #
