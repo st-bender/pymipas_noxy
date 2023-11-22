@@ -141,14 +141,14 @@ def main(
 
             # read species netcdfs into list
             mv8_noy_l = read_mv8_species_v1(config, out_target, year, month)
+            if not mv8_noy_l:
+                continue
             # interpolate to first (NO) altitudes
             mv8_noy_l = [mv8_noy_l[0]] + [
                 interp_altitude(_d, altitude=mv8_noy_l[0].altitude, method="linear")
                 for _d in mv8_noy_l[1:]
             ]
             debug("MIPAS v8 input list: %s", mv8_noy_l)
-            if not mv8_noy_l:
-                continue
 
             # combine into one data set
             mv8_noy_ds = combine_NOxy(mv8_noy_l)
