@@ -4,7 +4,7 @@ resolution = "R"
 
 [output]
 path = "tests/data"
-targets = ["NOx"]
+targets = ["NOx", "NOy"]
 
 [input]
 path = "tests/data"
@@ -13,6 +13,11 @@ path = "tests/data"
 targets = ["NO", "NO2"]
 versions = ["261_0", "261_0"] 
 weights = [1, 1]
+
+[input.NOy]
+targets = ["NO", "NO2", "N2O5"]
+versions = ["261_0", "261_0", "261_0"]
+weights = [1, 1, 2]
 
 [[times]]
 start = "20100401"
