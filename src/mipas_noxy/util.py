@@ -111,20 +111,27 @@ def open_mipas_l2(file, **kwargs):
     _dtype = mipv8_ds.target.dtype
     # Fix altitude naming and coordinates
     nc4_ds = _open_nc34(file)
-    _alt = xr.DataArray(
-        nc4_ds.variables["altitude"][:].astype(_dtype),
-        dims=("altitude", "time"),
-        coords={
-            "altitude": nc4_ds.variables["altitude"][:, 0].astype(_dtype),
-            "time": mipv8_ds.time
-        },
-    )
-    # Re-creates the original "altitude" variable but with a different name
-    mipv8_ds["alt"] = _alt
-    # Copies the attributes for the altitudes (now both of them)
-    alt_attrs = _get_attrs(nc4_ds.variables["altitude"])
-    mipv8_ds["alt"].attrs = alt_attrs
-    mipv8_ds["altitude"].attrs = alt_attrs
+
+    # Checks if `altitude` has more than one dimension
+    # and copies that to a separate variable to keep
+    # `altitude` as 1-d coordinates for further processing.
+    alt_var = nc4_ds.variables["altitude"]
+    alt_attrs = _get_attrs(alt_var)
+    alt_values = alt_var[:].astype(_dtype)
+    if len(alt_var.dimensions) > 1:
+        _alt = xr.DataArray(
+            alt_values,
+            dims=("altitude", "time"),
+            coords={
+                "altitude": ("altitude", alt_values[:, 0], alt_attrs),
+                "time": mipv8_ds.time
+            },
+            attrs=alt_attrs,
+        )
+        # Re-creates the original "altitude" variable but with a different name
+        mipv8_ds["alt"] = _alt
+    else:
+        mipv8_ds["altitude"] = ("altitude", alt_values, alt_attrs)
     return mipv8_ds
 
 
