@@ -11,7 +11,7 @@ path = "tests/data"
 
 [input.NOx]
 targets = ["NO", "NO2"]
-versions = ["261_0", "261_0"] 
+versions = ["261_0", "261_0"]
 weights = [1, 1]
 
 [input.NOy]
