@@ -45,7 +45,31 @@ def calc_zms(
     dim="geo_id",
     variable="target",  # for `ncount`
 ):
-    # zonal means
+    """Calculate cos(lat)-weighted zonal means
+
+    Calculates cosine(latitude)-weighted zonal means of a dataset.
+    Requires the latitude variable to be named "latitude", and the
+    overall range is fixed from -90 to +90 degrees.
+
+    Parameters
+    ----------
+    ds: `xarray.Dataset`
+        The dataset to bin.
+    dlat: float, optional (default: 5.0)
+        The latitude bin size in degrees.
+    dim: str, optional (default: "geo_id")
+        Name of the dimension(s) over which to aggregate the zonal means.
+    variable: str, optional (default: "target")
+        The name of the trace-gas "target" variable that is the main
+        component in the dataset. It is used to calculate the sum of the
+        weights and the number of usable data points in the bins.
+
+    Returns
+    -------
+    ds: `xarray.Dataset`
+        The zonal mean data set.
+    """
+    # zonal bins
     lat_edges = np.arange(-90, 90 + 0.5 * dlat, dlat)
     lat_cntrs = 0.5 * (lat_edges[:-1] + lat_edges[1:])
 
@@ -116,9 +140,33 @@ def calc_Ntot(
     vaxis=-1,  # vertical/radial axis for dr
     **kwargs  # passed to `calc_zms()`
 ):
-    #p_unit = getattr(au, ds.pressure.attrs["units"])
-    #T_unit = getattr(au, ds.temperature.attrs["units"])
-    # ndens = ds.pressure.data * p_unit / (ac.R * ds.temperature.data * T_unit)
+    """Calculate cos(lat)-weighted zonal mean densities
+
+    Calculates cosine(latitude)-weighted zonal mean densities
+    and number of molecules of the "vmr"-named variables in a dataset.
+    Requires the latitude variable to be named "latitude", and the
+    overall range is fixed from -90 to +90 degrees.
+    The vertical variable should be named "altitude".
+
+    Parameters
+    ----------
+    ds: `xarray.Dataset`
+        The dataset to bin.
+    vaxis: int, optional (default: -1)
+        The position of the vertical axis in the "vmr" variables.
+    **kwargs: dict, optional
+        Keyword arguments passed to `calc_zms()`.
+
+    Returns
+    -------
+    ds: `xarray.Dataset`
+        The zonal mean data set containing densities and number of molecules.
+
+    See Also
+    --------
+    calc_zms
+    """
+    # number density from ideal gas law
     ndens = ds.pressure / ac.R / ds.temperature
     # convert to number densities
     nd_ds = ds.copy()
