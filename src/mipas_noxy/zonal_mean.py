@@ -177,11 +177,11 @@ def calc_Ntot(
         nd_ds[nd_name] = nd_ds["ndens"] * nd_ds[_v]
         nd_ds[nd_name].attrs.update({
             "long_name":
-                nd_ds[_v].attrs["long_name"].replace(
+                nd_ds[_v].attrs.get("long_name", "volume mixing ratio").replace(
                     "volume mixing ratio", "number density"
                 ),
             "standard_name":
-                nd_ds[_v].attrs["standard_name"].replace(
+                nd_ds[_v].attrs.get("standard_name", "mole_fraction").replace(
                     "mole_fraction", "mole_concentration"
                 ),
         })
