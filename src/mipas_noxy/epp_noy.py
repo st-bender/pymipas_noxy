@@ -24,7 +24,7 @@ import numpy as np
 import xarray as xr
 
 # %%
-from .helpers import calc_Ntot
+from .zonal_mean import calc_Ntot
 
 # %%
 logging.basicConfig(

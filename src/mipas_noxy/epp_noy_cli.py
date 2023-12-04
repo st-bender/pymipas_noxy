@@ -41,13 +41,12 @@ from .util import (
     get_nc_filename,
 )
 from .helpers import (
-    calc_Ntot,
     calc_noy_bg_epp,
-    calc_zms,
     potential_temperature,
     select_common_data,
     smooth_targets,
 )
+from .zonal_mean import calc_Ntot, calc_zms
 from .plot import plot_corr_hist, plot_day_zms
 
 # %%
