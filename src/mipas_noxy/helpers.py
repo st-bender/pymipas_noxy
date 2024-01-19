@@ -85,7 +85,7 @@ def smooth_targets(a, b, smooth_vr=None, variable="target"):
     if smooth_vr is not None:
         vr_a = idl_smooth(vr_a, "altitude", smooth_vr)
         vr_b = idl_smooth(vr_b, "altitude", smooth_vr)
-    _vr_diffsq = (vr_a**2 - vr_b**2)
+    _vr_diffsq = (vr_a.fillna(0.)**2 - vr_b.fillna(0.)**2)
     # _vr_diffsq = (vr_a**2)
     vr_diff = xr.where(_vr_diffsq > 0., np.sqrt(_vr_diffsq), 1e-12)
     # Construct convolution matrix for resolution reduction
@@ -99,8 +99,9 @@ def smooth_targets(a, b, smooth_vr=None, variable="target"):
         # output_core_dims=[["out_alt", "altitude", "geo_id"]],
         join="outer",
     )
-    smooth_b = smooth_mat.dot(b[variable], dims="altitude")
+    smooth_b = smooth_mat.dot(b[variable].fillna(0.), dims="altitude")
     smooth_b = smooth_b.rename({"out_alt": "altitude"})
+    smooth_b.attrs = b[variable].attrs
     return smooth_b
 
 
