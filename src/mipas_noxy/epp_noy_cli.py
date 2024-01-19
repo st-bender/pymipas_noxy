@@ -325,19 +325,19 @@ def main(
             )
             mv8_noy_id, mv8_ch4_id, mv8_co_id = select_common_data(mv8_noy, mv8_ch4, mv8_co)
 
+            ch4i = mv8_ch4_id.interp(
+                altitude=mv8_noy_id.altitude,
+                kwargs=dict(bounds_error=False),
+            )
             smooth_vr = inp_conf[out_target].get("smooth_vr", None)
             info("vertical resolution smoothing: %s.", smooth_vr)
-            smooth_ch4 = smooth_targets(mv8_noy_id, mv8_ch4_id, smooth_vr=smooth_vr)
+            smooth_ch4 = smooth_targets(mv8_noy_id, ch4i, smooth_vr=smooth_vr)
             # smooth_ch4 = mv8_ch4_id.target.interp(altitude=mv8_noy_id.altitude)
             smooth_ch4 = smooth_ch4.rename("ch4_vmr")
             smooth_ch4.attrs = mv8_ch4.target.attrs
             debug("smooth_ch4: %s", smooth_ch4)
-            # interpolate CH4 averaging kernel diagonal for data selection
-            smooth_ch4akd = mv8_ch4_id.akm_diagonal.interp(
-                altitude=mv8_noy_id.altitude,
-                kwargs=dict(bounds_error=False, fill_value="extrapolate"),
-            )
-            smooth_ch4akd = smooth_ch4akd.rename("ch4_akd")
+            # keep interpolated CH4 averaging kernel diagonal for data selection
+            smooth_ch4akd = ch4i.akm_diagonal.rename("ch4_akd")
             smooth_ch4akd.attrs = mv8_ch4.akm_diagonal.attrs
             debug("smooth_ch4akd: %s", smooth_ch4akd)
 
