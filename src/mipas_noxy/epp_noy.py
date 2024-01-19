@@ -49,7 +49,7 @@ def tpot_at_noych4_min(ds, arange=(22, 44)):
     _ds_sel = ds.sel(altitude=slice(*arange))
     _min_ai = _ds_sel.noy_vs_ch4.argmin("altitude")
     min_ai = np.clip(_min_ai, 0, _ds_sel.altitude.size - 2)
-    return _ds_sel.T_pot.isel(altitude=min_ai + 1)
+    return _ds_sel.T_pot.isel(altitude=1 + min_ai)
 
 
 # %%
