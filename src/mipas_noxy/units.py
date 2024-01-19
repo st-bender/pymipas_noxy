@@ -49,6 +49,8 @@ au.add_enabled_aliases({"degree_north": au.degree})
 au.add_enabled_aliases({"degree_east": au.degree})
 au.add_enabled_aliases({"ppm": 1e-6 * au.mol / au.mol})
 au.add_enabled_aliases({"ppb": 1e-9 * au.mol / au.mol})
+au.add_enabled_aliases({"ppmv": 1e-6 * au.mol / au.mol})
+au.add_enabled_aliases({"ppbv": 1e-9 * au.mol / au.mol})
 
 # %%
 xru.init_units()
