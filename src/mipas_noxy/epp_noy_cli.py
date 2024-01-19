@@ -332,7 +332,6 @@ def main(
             smooth_vr = inp_conf[out_target].get("smooth_vr", None)
             info("vertical resolution smoothing: %s.", smooth_vr)
             smooth_ch4 = smooth_targets(mv8_noy_id, ch4i, smooth_vr=smooth_vr)
-            # smooth_ch4 = mv8_ch4_id.target.interp(altitude=mv8_noy_id.altitude)
             smooth_ch4 = smooth_ch4.rename("ch4_vmr")
             smooth_ch4.attrs = mv8_ch4.target.attrs
             debug("smooth_ch4: %s", smooth_ch4)
