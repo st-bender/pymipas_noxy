@@ -474,9 +474,6 @@ def process_day_multi2(
         Name of the dataset variable containing the CO vmr.
     noy_var: str
         Name of the dataset variable containing the NOy vmr.
-    dim: str, optional (default: "geo_id")
-        The dimension along which the profiles are iterated,
-        e.g. "time" or "geo_id".
     **kwargs: dict
         Keyword arguments passed to `epp_noy_multi()`.
 
