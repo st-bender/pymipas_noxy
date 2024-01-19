@@ -359,14 +359,9 @@ def main(
             combined["noy_vs_ch4"] = combined["vmr_noy"] / combined["vmr_ch4"]
             combined["noy_vs_ch4"].attrs = {"long_name": "NOy to CH4 ratio", "units": "1"}
             # Use p and T from the CH4 data set
-            combined["pressure"] = mv8_ch4_id.pressure.interp(
-                altitude=mv8_noy_id.altitude,
-                kwargs=dict(bounds_error=False),
-            ).fillna(mv8_noy_id.pressure)
-            combined["temperature"] = mv8_ch4_id.temperature.interp(
-                altitude=mv8_noy_id.altitude,
-                kwargs=dict(bounds_error=False),
-            ).fillna(mv8_noy_id.temperature)
+            # Fills (extrapolated) NaNs with the values from the NOy dataset
+            combined["pressure"] = ch4i.pressure.fillna(mv8_noy_id.pressure)
+            combined["temperature"] = ch4i.temperature.fillna(mv8_noy_id.temperature)
             combined["T_pot"] = potential_temperature(
                 combined.pressure,
                 combined.temperature,
