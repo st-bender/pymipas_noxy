@@ -233,3 +233,99 @@ def sub_bg_noy(
     })
     ret.attrs.update(h_sds.attrs)
     return ret
+
+
+# %%
+def _noy_co_ratio(ds, dname, vname, co, am=120):
+    """NOy density based on NOy / CO vmr ratio
+
+    Adjusts the NOy density based on the NOy / CO vmr ratio at the
+    selected altitude (index). Above that level, the density is set
+    to [NOy] * min(NOy, NOy0 * CO / CO0) / NOy.
+    """
+    ret = ds[dname].copy()
+    # select on altitude instead of index (as in IDL) to be independent
+    # of the provided altitude grid.
+    maxr = ds[vname].sel(altitude=am) / co.sel(altitude=am)
+    ret = ret.where(
+        ret.altitude > maxr.altitude,
+        ds[dname] * (np.minimum(ds[vname], maxr * co) / ds[vname])
+    )
+    return ret
+
+
+def fix_noy_co_ch4(ds, dname, vname, co, ch4):
+    """Re-adjust zonal mean NOy based on CH4 and CO
+
+    Adjusts NOy based on CO limits and relative to CH4 in certain locations
+    and for polar autumn.
+    """
+    cond1 = (co < 0.03) & (ds[vname] < 0.008 + ch4 * 0.03)
+    ds[dname] = ds[dname].where(~cond1, 1e-20)
+    ds[vname] = ds[vname].where(~cond1, 1e-20)
+    cond2 = (ds[vname] >= 0.008 + ch4 * 0.03)
+    dens1 = ds[dname].copy()
+    vmr1 = ds[vname].copy()
+
+    # SH
+    for _m, _am in zip([4, 5, 6], [50, 46, 37]):
+        _cs = (ds.time.dt.month.isin([_m])) & (ds.latitude < 0.0)
+        ds[dname] = ds[dname].where(
+            ~_cs,
+            _noy_co_ratio(ds, dname, vname, co, am=_am),
+        )
+    # NH
+    for _m, _am in zip([10, 11], [50, 46]):
+        _cn = (ds.time.dt.month.isin([_m])) & (ds.latitude >= 0.0)
+        ds[dname] = ds[dname].where(
+            ~_cn,
+            _noy_co_ratio(ds, dname, vname, co, am=_am),
+        )
+
+    ds[dname] = ds[dname].where(~cond2, dens1)
+    ds[vname] = ds[vname].where(~cond2, vmr1)
+    return ds
+
+
+def pre_process_zm(ds, dname, vname, co=None, ch4=None):
+    """(Pre)process zonal mean NOy densities
+
+    (Pre)processes zonal mean NOy densities to fix some left-over issues
+    and to reduce outliers for fitting the UBC model.
+    Also calculates the hemispheric NOy amount per altitude level.
+
+    Parameters
+    ----------
+    ds: `xarray.Dataset`
+        The zonal mean NOy dataset.
+    dname: str
+        Name of the dataset variable containing the NOy number densities.
+    vname: str
+        Name of the dataset variable containing the NOy volume mixing ratios.
+    co: `xarray.DataArray`, optional (default: None)
+        Matching zonal-mean CO volume mixing ratios.
+    ch4: `xarray.DataArray`, optional (default: None)
+        Matching zonal-mean CH4 volume mixing ratios.
+
+    Returns
+    -------
+    noy: `xarray.Dataset`
+        The processed dataset, containing also the NOy amount per level
+        in the variable "ams" and in units [mol / km].
+    """
+    R_earth = 6356.0 * au.km
+    N_avo = 6.02214129e+23 / au.mol
+
+    ds = ds.interpolate_na("latitude")
+    ds[dname] = np.maximum(ds[dname], 1e-20)
+    ds[vname] = np.maximum(ds[vname], 1e-20)
+    if (co is not None) and (ch4 is not None):
+        ds = fix_noy_co_ch4(ds, dname, vname, co, ch4)
+
+    ds[dname] = np.maximum(ds[dname], 0.0)
+
+    cos_lat = np.cos(np.radians(ds.latitude))
+    cos_lat.attrs["units"] = "1"
+    area = cos_lat * np.radians(np.gradient(ds.latitude.values)) * 2 * np.pi * R_earth**2
+    ds["ams"] = (ds[dname] * area / N_avo).to_unit("mol / km")
+    return ds
