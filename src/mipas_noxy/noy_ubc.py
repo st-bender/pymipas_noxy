@@ -168,7 +168,7 @@ def Nm_func_F16(t, Nm, wm, tm):
     ----------
     t: float of array_like
         The time(s) for which to calculate the NOy amount for,
-        day of year for CH, days since 01. Jul for NH.
+        day of year for SH, days since 01. Jul for NH.
     Nm: float
         The maximum NOy amount per season.
     wm: float
