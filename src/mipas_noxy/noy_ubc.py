@@ -183,3 +183,108 @@ def Nm_func_F16(t, Nm, wm, tm):
     """
     expon = np.exp(-wm * (t - tm))
     return 4.0 * Nm * expon / (1 + expon)**2
+
+
+def _time_matrix(ts, dw=250):
+    """Time-matrix for convolution
+
+    The result matrix contains dw columns for consecutive days (backwards)
+    for each t in ts (rows).
+
+    Parameters
+    ----------
+    ts: float or array_like (N,)
+        The time(s) for which the window times should be returned.
+
+    Returns
+    -------
+    tm: `xr.DataArray` of shape (N, dw)
+        The time matrix for selecting the Ap indices going back in time
+        `dw` days. The first dimension is the original time dimension,
+        the second the shifted times for the filter.
+    """
+    dl0 = np.arange(dw, dtype=float)
+    tm = xr.DataArray(
+        ts[:, None] - pd.to_timedelta(dl0, unit="d").to_numpy(),
+        # use underscore to not confuse with an existing `time` dimension
+        dims=["_time", "filter"],
+        coords={"_time": ts},
+    )
+    return tm
+
+
+def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
+    """Elevated-Stratopause parametrization of NOy
+
+    Parameters
+    ----------
+    t: float or array_like
+        The time(s) of the ESE.
+    p: float or array_like
+        The pressure level(s) for which to calculate the NOy amount for.
+    nn: float
+        The maximum NOy amount per NH season.
+    wn: float
+        The width of the NH NOy distribution.
+    tn: float
+        The occurence day (since Jul 01) of the NH NOy maximum.
+    ap_da: `xr.DataArray`
+        DataArray containing the Ap time series.
+    avtype: str, optional (default: daily)
+        Type of averaging, oprions: "daily" or "average".
+    dw: int, optional (default: 250)
+        Window size (in days) for Ap averaging.
+    xtype: str, optional (default: "dens")
+        Type of variable, "dens" for density and "flux" for flux.
+
+    Returns
+    -------
+    ese: array_like
+        The hemispheric NOy amount in units of `nn` (typically Gmol / km);
+        variable length from onset day to 324 days after July 1.
+    """
+    tm_poly = [ 62.7637, 23.3374, 3.34175, 0.2589, 0.0106088]             #; vertical time lag variation
+    fm_poly = [ 0.357087, -0.239236, 0.00420932, 0.0105685, 0.00107633 ]  #; vertical flux variation
+    wm_poly = [ -1.69674, -0.493714, +0.151089, +0.00082302, -0.0139315, -0.000871843, +0.000161791 ]   #; vertical wbar variation
+    dn = days_since_Jul01(t).values.astype(int)
+    dl = np.arange(dw, dtype=float)
+    dl[0] = 0.5
+    ies = 0
+    lp = np.log(p)                                                               #; log pressure levels
+    tm = 62.7637+23.3374*lp+3.34175*lp*lp+0.2589*lp*lp*lp+0.0106088*lp*lp*lp*lp  #; vertical time lag variation
+    tm = np.minimum(tm + np.exp((tm+dn-279.)/4.), 270.)                          #; variation at equinox transition
+    xu = 4*np.exp(-0.046*(dn-173.))/(1.+np.exp(-0.046*(dn-173.)))**2*0.0075       #; seasonal dependence of amount at source region
+    wu = 4*np.exp(-0.043*(dn-173.))/(1.+np.exp(-0.043*(dn-173.)))**2*1.25         #; seasonal dependence of ESE wbar at source region
+    fm = 0.357087-0.239236*lp+0.00420932*lp*lp+0.0105685*lp*lp*lp+0.00107633*lp*lp*lp*lp  #; vertical flux variation
+    fm = np.maximum(fm/(1.+np.exp((tm+dn-273.)/8.))*xu*wu, 0.)                            #; scale with source region amount*wbar, consider equinox transition
+    wm = np.exp(
+        -1.69674-0.493714*lp+0.151089*lp*lp+0.00082302*lp*lp*lp-0.0139315*lp*lp*lp*lp-    #; vertical wbar variation
+        0.000871843*lp*lp*lp*lp*lp+0.000161791*lp*lp*lp*lp*lp*lp
+    )
+    wm = wm/(1.+np.exp((tm+dn-280)/9.))*wu  #; scale with source region wbar, consider equinox transition
+    xb = Nm_func_F16(dn + tm.astype(int), nn, wn, tn)
+    if xtype == 'dens': nne = fm/wm-xb
+    if xtype == 'dens': we = 0.15
+    if xtype == 'flux': nne = fm-xb
+    if xtype == 'flux': we = 0.15
+    if avtype != 'average':
+        filtere = Green_filter_F16(dl, tm, (np.sqrt(0.7 * tm) + 6.0) / np.sqrt(2))
+    xe = np.zeros(324 - dn, dtype=float)
+    tl = dn + tm
+    it = 0
+    while (dn + it < 324): #  and it < n_elements(tim)):         #; convolve with Ap
+        if it - ies < tm:
+            rfac = ((it - ies) / tm)**0.3
+        else:
+            rfac = 1.  #;fade in after ESE onset
+        if dn + it > 304:
+             rfac = rfac * ((324 - dn - it)/20.)**0.5      #; fade out after 1st May
+        sease = rfac * Nm_func_F16(dn + it, nne, we, tl)
+        if avtype == 'average':
+            xe[it] = sease * ap_da.sel(time=t.values)
+        else:
+           apts = _time_matrix((t + pd.to_timedelta(it, unit="D")).values, dw=dw)
+           aph = ap_da.sel(time=apts).values.T
+           xe[it] = xe[it] + sease * filtere.dot(aph)
+        it = it + 1
+    return xe
