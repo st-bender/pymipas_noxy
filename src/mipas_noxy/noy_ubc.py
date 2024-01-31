@@ -89,7 +89,8 @@ def Green_func_F16(t, Γ, Δ):
     """
     nrm = np.sqrt(Γ**3 / (4 * np.pi * Δ**2 * t**3))
     nexpon = 0.25 * Γ * (t - Γ)**2 / (Δ**2 * t)
-    return nrm * np.exp(-nexpon)
+    ret = nrm * np.exp(-nexpon)
+    return np.where(t > 0.0, ret, 0.0)
 
 
 def Green_filter_F16(ts, Γ, Δ, axis=-1):
@@ -153,6 +154,7 @@ def Green_filter_ubc(ts, Γ, Δ, axis=-1):
         given parameters evaluated at `ts`.
     """
     f = ts**-1.5 * np.exp(-(ts - Γ)**2 / (4. * Δ**2 * ts / Γ))
+    f = np.where(ts > 0.0, f, 0.0)
     n = np.nansum(f, axis=axis)
     return f / n
 
