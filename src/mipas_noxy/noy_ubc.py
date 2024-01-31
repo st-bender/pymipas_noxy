@@ -260,9 +260,9 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
     tm = polyval(lp, tm_poly)  #; vertical time lag variation
     tm = np.minimum(tm + np.exp((tm + dn - 279.) / 4.), 270.)                    #; variation at equinox transition
     #; seasonal dependence of amount at source region
-    xu = 4 * np.exp(-0.046 * (dn - 173.)) / (1. + np.exp(-0.046 * (dn - 173.)))**2 * 0.0075
+    xu = Nm_func_F16(dn, 1.0, 0.046, 173.) * 0.0075
     #; seasonal dependence of ESE wbar at source region
-    wu = 4 * np.exp(-0.043 * (dn - 173.)) / (1. + np.exp(-0.043 * (dn - 173.)))**2 * 1.25
+    wu = Nm_func_F16(dn, 1.0, 0.043, 173.) * 1.25
     fm = polyval(lp, fm_poly)  #; vertical flux variation
     #; scale with source region amount*wbar, consider equinox transition
     fm = np.maximum(fm / (1. + np.exp((tm + dn - 273.) / 8.)) * xu * wu, 0.)
