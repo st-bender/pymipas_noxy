@@ -276,9 +276,9 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
     wm = wm / (1. + np.exp((tm + dn - 280) / 9.)) * wu
     xb = Nm_func_F16(dn + tm.astype(int), nn, wn, tn)
     we = 0.15
-    if xtype == 'dens': nne = fm / wm - xb
-    if xtype == 'flux': nne = fm - xb
-    if avtype != 'average':
+    if xtype == "dens": nne = fm / wm - xb
+    if xtype == "flux": nne = fm - xb
+    if avtype != "average":
         filtere = Green_filter_F16(dl, tm, (np.sqrt(0.7 * tm) + 6.0) / np.sqrt(2))
     xe = np.zeros(324 - dn, dtype=float)
     tl = dn + tm
@@ -291,7 +291,7 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
         if dn + it > 304:
              rfac = rfac * ((324 - dn - it)/20.)**0.5      #; fade out after 1st May
         sease = rfac * Nm_func_F16(dn + it, nne, we, tl)
-        if avtype == 'average':
+        if avtype == "average":
             xe[it] = sease * ap_da.sel(time=t.values)
         else:
            apts = _time_matrix((t + pd.to_timedelta(it, unit="D")).values, dw=dw)
