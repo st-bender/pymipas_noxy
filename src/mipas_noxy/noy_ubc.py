@@ -249,16 +249,21 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
         The hemispheric NOy amount in units of `nn` (typically Gmol / km);
         variable length from onset day to 324 days after July 1.
     """
-    tm_poly = [ 62.7637, 23.3374, 3.34175, 0.2589, 0.0106088]             #; vertical time lag variation
-    fm_poly = [ 0.357087, -0.239236, 0.00420932, 0.0105685, 0.00107633 ]  #; vertical flux variation
-    wm_poly = [ -1.69674, -0.493714, +0.151089, +0.00082302, -0.0139315, -0.000871843, +0.000161791 ]   #; vertical wbar variation
+    #; vertical time lag variation
+    tm_poly = [ 62.7637, 23.3374, 3.34175, 0.2589, 0.0106088]
+    #; vertical flux variation
+    fm_poly = [ 0.357087, -0.239236, 0.00420932, 0.0105685, 0.00107633 ]
+    #; vertical wbar variation
+    wm_poly = [ -1.69674, -0.493714, +0.151089, +0.00082302, -0.0139315, -0.000871843, +0.000161791 ]
+
     dn = days_since_Jul01(t).values.astype(int)
     dl = np.arange(dw, dtype=float)
     dl[0] = 0.5
     ies = 0
-    lp = np.log(p)                                                               #; log pressure levels
+    lp = np.log(p)             #; log pressure levels
     tm = polyval(lp, tm_poly)  #; vertical time lag variation
-    tm = np.minimum(tm + np.exp((tm + dn - 279.) / 4.), 270.)                    #; variation at equinox transition
+    #; variation at equinox transition
+    tm = np.minimum(tm + np.exp((tm + dn - 279.) / 4.), 270.)
     #; seasonal dependence of amount at source region
     xu = Nm_func_F16(dn, 1.0, 0.046, 173.) * 0.0075
     #; seasonal dependence of ESE wbar at source region
