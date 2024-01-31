@@ -26,6 +26,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from numpy.polynomial.polynomial import polyval
+
 # %%
 logging.basicConfig(
     level=logging.INFO,
@@ -255,19 +257,16 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
     dl[0] = 0.5
     ies = 0
     lp = np.log(p)                                                               #; log pressure levels
-    tm = 62.7637+23.3374*lp+3.34175*lp*lp+0.2589*lp*lp*lp+0.0106088*lp*lp*lp*lp  #; vertical time lag variation
+    tm = polyval(lp, tm_poly)  #; vertical time lag variation
     tm = np.minimum(tm + np.exp((tm + dn - 279.) / 4.), 270.)                    #; variation at equinox transition
     #; seasonal dependence of amount at source region
     xu = 4 * np.exp(-0.046 * (dn - 173.)) / (1. + np.exp(-0.046 * (dn - 173.)))**2 * 0.0075
     #; seasonal dependence of ESE wbar at source region
     wu = 4 * np.exp(-0.043 * (dn - 173.)) / (1. + np.exp(-0.043 * (dn - 173.)))**2 * 1.25
-    fm = 0.357087-0.239236*lp+0.00420932*lp*lp+0.0105685*lp*lp*lp+0.00107633*lp*lp*lp*lp  #; vertical flux variation
+    fm = polyval(lp, fm_poly)  #; vertical flux variation
     #; scale with source region amount*wbar, consider equinox transition
     fm = np.maximum(fm / (1. + np.exp((tm + dn - 273.) / 8.)) * xu * wu, 0.)
-    wm = np.exp(
-        -1.69674-0.493714*lp+0.151089*lp*lp+0.00082302*lp*lp*lp-0.0139315*lp*lp*lp*lp-    #; vertical wbar variation
-        0.000871843*lp*lp*lp*lp*lp+0.000161791*lp*lp*lp*lp*lp*lp
-    )
+    wm = np.exp(polyval(lp, wm_poly))  #; vertical wbar variation
     #; scale with source region wbar, consider equinox transition
     wm = wm / (1. + np.exp((tm + dn - 280) / 9.)) * wu
     xb = Nm_func_F16(dn + tm.astype(int), nn, wn, tn)
