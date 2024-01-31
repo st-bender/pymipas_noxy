@@ -53,7 +53,9 @@ def days_since_Jul01(ts):
 
     Returns
     -------
-    ds: `xr.DataArray`
+    da: `xr.DataArray`
+        The number of whole days since July 1 with the same
+        dimensions as `ts`.
     """
     return xr.where(
         ts.dt.month < 7,
@@ -61,7 +63,7 @@ def days_since_Jul01(ts):
         (
             # time difference is in nanoseconds
             ts - pd.to_datetime([f"{y.values}-07-01" for y in ts.dt.year])
-        ).astype(float) / 86_400_000_000_000 + 1,  # convert to days.
+        ).astype(int) // 86_400_000_000_000 + 1,  # convert to days.
     )
 
 
