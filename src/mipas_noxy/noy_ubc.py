@@ -91,8 +91,8 @@ def Green_func_F16(t, Γ, Δ):
         The "Inverse Gaussian" Green's function with the given parameters
         evaluated at `t`.
     """
-    nrm = np.sqrt(Γ**3 / (4 * np.pi * Δ**2 * t**3))
-    nexpon = 0.25 * Γ * (t - Γ)**2 / (Δ**2 * t)
+    nrm = np.sqrt(Γ**3 / (4.0 * np.pi * Δ**2 * t**3))
+    nexpon = Γ * (t - Γ)**2 / (4.0 * Δ**2 * t)
     ret = nrm * np.exp(-nexpon)
     return np.where(t > 0.0, ret, 0.0)
 
