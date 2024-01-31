@@ -93,7 +93,7 @@ def Green_func_F16(t, Γ, Δ):
 
 
 def Green_filter_F16(ts, Γ, Δ, axis=-1):
-    """ Normalized "Inverse Gaussian" Green's function filter
+    r""" Normalized "Inverse Gaussian" Green's function filter
 
     Normalized "Inverse Gaussian" type Green's function filter such that
     \int_{-\infty}^{t} G(t') dt' = 1.
@@ -102,7 +102,7 @@ def Green_filter_F16(ts, Γ, Δ, axis=-1):
 
     Parameters
     ----------
-    ts: float of array_like
+    ts: float or array_like
         The time(s) for which to calculate the Green's function,
         same units as Γ. Should be equally spaced for correct normalizaion.
     Γ: float
@@ -125,7 +125,7 @@ def Green_filter_F16(ts, Γ, Δ, axis=-1):
 
 
 def Green_filter_ubc(ts, Γ, Δ, axis=-1):
-    """ Normalized "Inverse Gaussian" Green's function filter
+    r""" Normalized "Inverse Gaussian" Green's function filter
 
     Normalized "Inverse Gaussian" type Green's function filter
     as implemented in the UBC IDL code, therein with
@@ -135,7 +135,7 @@ def Green_filter_ubc(ts, Γ, Δ, axis=-1):
 
     Parameters
     ----------
-    ts: float of array_like
+    ts: float or array_like
         The time(s) for which to calculate the Green's function,
         same units as Γ. Should be equally spaced for correct normalizaion.
     Γ: float
@@ -166,7 +166,7 @@ def Nm_func_F16(t, Nm, wm, tm):
 
     Parameters
     ----------
-    t: float of array_like
+    t: float or array_like
         The time(s) for which to calculate the NOy amount for,
         day of year for SH, days since 01. Jul for NH.
     Nm: float
