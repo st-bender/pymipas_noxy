@@ -265,9 +265,11 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
     #; variation at equinox transition
     tm = np.minimum(tm + np.exp((tm + dn - 279.) / 4.), 270.)
     #; seasonal dependence of amount at source region
-    xu = Nm_func_F16(dn, 1.0, 0.046, 173.) * 0.0075
+    # Funke et al., 2016, (21) with 0.0075 * 4 = 0.03
+    xu = Nm_func_F16(dn, 0.0075, 0.046, 173.)
     #; seasonal dependence of ESE wbar at source region
-    wu = Nm_func_F16(dn, 1.0, 0.043, 173.) * 1.25
+    # Funke et al., 2016, (21) with 1.25 * 4 = 5
+    wu = Nm_func_F16(dn, 1.25, 0.043, 173.)
     fm = polyval(lp, fm_poly)  #; vertical flux variation
     #; scale with source region amount*wbar, consider equinox transition
     fm = np.maximum(fm / (1. + np.exp((tm + dn - 273.) / 8.)) * xu * wu, 0.)
