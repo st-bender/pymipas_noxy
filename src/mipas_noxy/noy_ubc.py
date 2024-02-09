@@ -286,10 +286,8 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
     tl = dn + tm
     it = 0
     while (dn + it < 324): #  and it < n_elements(tim)):         #; convolve with Ap
-        if it - ies < tm:
-            rfac = ((it - ies) / tm)**0.3
-        else:
-            rfac = 1.  #;fade in after ESE onset
+        # fade in after ESE onset
+        rfac = np.where(it - ies < tm, ((it - ies) / tm)**0.3, 1)
         if dn + it > 304:
              rfac = rfac * ((324 - dn - it)/20.)**0.5      #; fade out after 1st May
         sease = rfac * Nm_func_F16(dn + it, nne, we, tl)
