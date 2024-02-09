@@ -125,7 +125,7 @@ def Green_filter_F16(ts, Γ, Δ, axis=-1):
         given parameters evaluated at `ts`.
     """
     f = Green_func_F16(ts, Γ, Δ)
-    n = np.nansum(f, axis=axis)
+    n = np.nansum(f, axis=axis, keepdims=True)
     return f / n
 
 
