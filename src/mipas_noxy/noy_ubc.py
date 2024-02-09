@@ -283,7 +283,10 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
     if avtype != "average":
         dx = (np.sqrt(0.7 * tm) + 6.0) / np.sqrt(2)
         filtere = Green_filter_F16(dl, tm[:, None], dx[:, None])
-    xe = np.zeros(324 - dn, dtype=float)
+    try:
+        xe = np.zeros((324 - dn[0], len(p)), dtype=float)
+    except TypeError:  # p does not have a `len()`
+        xe = np.zeros(324 - dn[0], dtype=float)
     tl = dn + tm
     it = 0
     while (dn + it < 324): #  and it < n_elements(tim)):         #; convolve with Ap
