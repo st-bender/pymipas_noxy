@@ -256,6 +256,8 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
     #; vertical wbar variation
     wm_poly = [ -1.69674, -0.493714, +0.151089, +0.00082302, -0.0139315, -0.000871843, +0.000161791 ]
 
+    if len(t.shape) < 1:
+        t = xr.DataArray(t).expand_dims("time")
     dn = days_since_Jul01(t).values.astype(int)
     dl = np.arange(dw, dtype=float)
     dl[0] = 0.5
