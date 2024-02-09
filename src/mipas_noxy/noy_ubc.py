@@ -191,7 +191,7 @@ def Nm_func_F16(t, Nm, wm, tm):
     return 4.0 * Nm * expon / (1 + expon)**2
 
 
-def _time_matrix(ts, dw=250):
+def time_matrix(ts, dw=250):
     """Time-matrix for convolution
 
     The result matrix contains dw columns for consecutive days (backwards)
@@ -296,7 +296,7 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
         if avtype == "average":
             xe[it] = sease * ap_da.sel(time=t.values)
         else:
-           apts = _time_matrix((t + pd.to_timedelta(it, unit="D")).values, dw=dw)
+           apts = time_matrix((t + pd.to_timedelta(it, unit="D")).values, dw=dw)
            aph = ap_da.sel(time=apts).values.T
            xe[it] = xe[it] + (sease * filtere.dot(aph))[0]
         it = it + 1
