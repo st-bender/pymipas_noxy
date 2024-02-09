@@ -281,7 +281,8 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
     if xtype == "dens": nne = fm / wm - xb
     if xtype == "flux": nne = fm - xb
     if avtype != "average":
-        filtere = Green_filter_F16(dl, tm, (np.sqrt(0.7 * tm) + 6.0) / np.sqrt(2))
+        dx = (np.sqrt(0.7 * tm) + 6.0) / np.sqrt(2)
+        filtere = Green_filter_F16(dl, tm[:, None], dx[:, None])
     xe = np.zeros(324 - dn, dtype=float)
     tl = dn + tm
     it = 0
