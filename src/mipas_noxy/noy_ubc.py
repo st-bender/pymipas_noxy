@@ -301,7 +301,7 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
             xe[it] = sease * ap_da.sel(time=t.values)
         else:
            apts = time_matrix((t + pd.to_timedelta(it, unit="D")).values, dw=dw)
-           aph = ap_da.sel(time=apts).values.T
-           xe[it] = xe[it] + (sease * filtere.dot(aph))[0]
+           aph = ap_da.sel(time=apts).values
+           xe[it] = xe[it] + (sease * aph.dot(filtere.T)[0])
         it = it + 1
     return xe
