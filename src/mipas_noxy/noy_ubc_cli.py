@@ -319,19 +319,27 @@ P3R[:,16] = [ 0.568,  1.026,  1.309,  1.313,  0.804,  0.214, -0.353, -0.250, -0.
 P3R[:,17] = [ 0.989,  1.509,  1.872,  2.185,  0.844,  0.276,  0.081,  0.081, -0.090, -0.413, -0.502, -0.572]
 
 
+def _interp(x, xp, fp, **kwargs):
+    _fill_value = kwargs.pop("fill_value", "extrapolate")
+    # only scipy seems to do linear extrapolation
+    _intp = interp1d(xp, fp, fill_value=_fill_value, **kwargs)
+    ret = _intp(x)
+    return ret
+
+
 def noy_bg(pres, times, xtype="dens"):
     ds = times.dt.dayofyear.rename("ds").values
     f1 = 2 * np.pi * ds / 365.0
     f2 = 4 * np.pi * ds / 365.0
     f3 = 6 * np.pi * ds / 365.0
     if xtype == "dens":
-        am = np.atleast_3d(interp1d(PREF, AMR, axis=0)(pres))
-        a1 = np.atleast_3d(interp1d(PREF, A1R, axis=0)(pres))
-        a2 = np.atleast_3d(interp1d(PREF, A2R, axis=0)(pres))
-        a3 = np.atleast_3d(interp1d(PREF, A3R, axis=0)(pres))
-        p1 = np.atleast_3d(interp1d(PREF, P1R, axis=0)(pres))
-        p2 = np.atleast_3d(interp1d(PREF, P2R, axis=0)(pres))
-        p3 = np.atleast_3d(interp1d(PREF, P3R, axis=0)(pres))
+        am = np.atleast_3d(_interp(pres, PREF, AMR, axis=0))
+        a1 = np.atleast_3d(_interp(pres, PREF, A1R, axis=0))
+        a2 = np.atleast_3d(_interp(pres, PREF, A2R, axis=0))
+        a3 = np.atleast_3d(_interp(pres, PREF, A3R, axis=0))
+        p1 = np.atleast_3d(_interp(pres, PREF, P1R, axis=0))
+        p2 = np.atleast_3d(_interp(pres, PREF, P2R, axis=0))
+        p3 = np.atleast_3d(_interp(pres, PREF, P3R, axis=0))
         bg = am * (1.0 + a1 * np.sin(f1 + p1) + a2 * np.sin(f2 + p2) + a3 * np.sin(f3 + p3))
         return bg
     else:
@@ -344,21 +352,20 @@ def noy_epp(pres, lats, times, ap_da, dw=DW, xtype="dens"):
     dl = np.arange(dw, dtype=float)
     dl[0] = 0.5
 
-    pix = np.argsort(PREF)  # np.interp() needs ascending order
     if xtype == "dens":
-        tn = np.interp(pres, PREF[pix], TMNR[pix])
-        ts = np.interp(pres, PREF[pix], TMSR[pix])
-        nn = np.interp(pres, PREF[pix], NMNR[pix])
-        ns = np.interp(pres, PREF[pix], NMSR[pix])
-        wn = np.interp(pres, PREF[pix], WMNR[pix])
-        ws = np.interp(pres, PREF[pix], WMSR[pix])
+        tn = _interp(pres, PREF, TMNR)
+        ts = _interp(pres, PREF, TMSR)
+        nn = _interp(pres, PREF, NMNR)
+        ns = _interp(pres, PREF, NMSR)
+        wn = _interp(pres, PREF, WMNR)
+        ws = _interp(pres, PREF, WMSR)
     elif xtype == "flux":
-        tn = np.interp(pres, PREF[pix], TFNR[pix])
-        ts = np.interp(pres, PREF[pix], TFSR[pix])
-        nn = np.interp(pres, PREF[pix], NFNR[pix])
-        ns = np.interp(pres, PREF[pix], NFSR[pix])
-        wn = np.interp(pres, PREF[pix], WFNR[pix])
-        ws = np.interp(pres, PREF[pix], WFSR[pix])
+        tn = _interp(pres, PREF, TFNR)
+        ts = _interp(pres, PREF, TFSR)
+        nn = _interp(pres, PREF, NFNR)
+        ns = _interp(pres, PREF, NFSR)
+        wn = _interp(pres, PREF, WFNR)
+        ws = _interp(pres, PREF, WFSR)
     else:
         logger.error("Unknown `xtype` '%s'.", xtype)
         return -3
@@ -368,8 +375,8 @@ def noy_epp(pres, lats, times, ap_da, dw=DW, xtype="dens"):
     logger.info("seasn: %s", seasn.shape)
     logger.info("seass: %s", seass.shape)
 
-    txn = np.interp(pres, PREF[pix], TXNR[pix])[:, None]
-    txs = np.interp(pres, PREF[pix], TXSR[pix])[:, None]
+    txn = _interp(pres, PREF, TXNR)[:, None]
+    txs = _interp(pres, PREF, TXSR)[:, None]
     dxn = (np.sqrt(0.7 * txn) + 6) / np.sqrt(2.0)
     dxs = (np.sqrt(0.7 * txs) + 6) / np.sqrt(2.0)
     filtern = Green_filter_F16(dl, txn, dxn)
@@ -393,15 +400,14 @@ def noy_ese1(pres, times, ese_dates, ap_da, avtype="daily", dw=DW, xtype="dens")
         )
         return noy_ese_da.T
 
-    pix = np.argsort(PREF)  # np.interp() needs ascending order
     if xtype == "dens":
-        tn = np.interp(pres, PREF[pix], TMNR[pix])
-        nn = np.interp(pres, PREF[pix], NMNR[pix])
-        wn = np.interp(pres, PREF[pix], WMNR[pix])
+        tn = _interp(pres, PREF, TMNR)
+        nn = _interp(pres, PREF, NMNR)
+        wn = _interp(pres, PREF, WMNR)
     elif xtype == "flux":
-        tn = np.interp(pres, PREF[pix], TFNR[pix])
-        nn = np.interp(pres, PREF[pix], NFNR[pix])
-        wn = np.interp(pres, PREF[pix], WFNR[pix])
+        tn = _interp(pres, PREF, TFNR)
+        nn = _interp(pres, PREF, NFNR)
+        wn = _interp(pres, PREF, WFNR)
     else:
         logger.error("Unknown `xtype` '%s'.", xtype)
         return -3
@@ -420,8 +426,8 @@ def noy_ese1(pres, times, ese_dates, ap_da, avtype="daily", dw=DW, xtype="dens")
 
 
 def lat_distr(pres, lats, xx, ld, lref, xtype="dens"):
-    hh = interp1d(PREF, ld, axis=0)(pres)
-    xld = interp1d(lref, hh, axis=1)(lats)
+    hh = _interp(pres, PREF, ld, axis=0)
+    xld = _interp(lats, lref, hh, axis=1)
     logger.info("xld: %s", xld.shape)
     dlat = np.gradient(lats)
     lat_hi = lats + 0.5 * dlat
