@@ -258,6 +258,9 @@ def noy_ese(t, p, nn, wn, tn, ap_da, avtype="daily", dw=250, xtype="dens"):
 
     if len(t.shape) < 1:
         t = xr.DataArray(t).expand_dims("time")
+    nn = np.asarray(nn)
+    wn = np.asarray(wn)
+    tn = np.asarray(tn)
     dn = days_since_Jul01(t).values.astype(int)
     dl = np.arange(dw, dtype=float)
     dl[0] = 0.5
