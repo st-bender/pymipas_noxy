@@ -62,10 +62,34 @@ def g_weights(xs, μ, σ):
 
 
 # %%
-def idl_smooth(d, dim, n):
+def idl_smooth_fast(d, dim, n):
     if not n % 2:
         n = n + 1
     ret = d.rolling(center=True, min_periods=n, **{dim: n}).mean(dim).fillna(d)
+    return ret
+
+
+# %%
+def idl_smooth(d, dim, n):
+    if n % 2 == 0:
+        n = n + 1
+    dr = d.rolling(center=True, min_periods=n, **{dim: n}).construct("window").copy()
+    idim = tuple(dr.dims).index(dim)
+    iwin = tuple(dr.dims).index("window")
+    ldim = d[dim].size
+    sl = [slice(None, None, None)] * dr.ndim
+    # fill edges with nan
+    for i in range(n // 2):
+        sl1 = sl.copy()
+        sl2 = sl.copy()
+        sl1[idim] = i
+        sl1[iwin] = slice(n // 2 + i + 1, None, None)
+        dr[tuple(sl1)] = np.nan
+        sl2[idim] = ldim - i - 1
+        sl2[iwin] = slice(None, n // 2 - i, None)
+        dr[tuple(sl2)] = np.nan
+    logger.debug("rolling data: %s", dr)
+    ret = dr.mean("window")
     return ret
 
 
