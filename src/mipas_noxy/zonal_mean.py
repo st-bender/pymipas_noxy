@@ -79,7 +79,7 @@ def calc_zms(
     ds = ds.set_coords(("latitude",))  # set as coordinate for binning
 
     weights = np.cos(ds["latitude"].to_unit(au.radian))
-    weights.attrs = {"long_name": "cosine of latitude", "units": "1"}
+    weights.attrs = {"units": "1"}
     weights = weights.where(ds[zm_vars].notnull())
     weights = weights.fillna(0.)
     # weighted data sum per bin
